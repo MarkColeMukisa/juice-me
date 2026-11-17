@@ -3,39 +3,40 @@ import { Appearance, useColorScheme } from "react-native";
 import * as storage from "./storage";
 
 /**
- * The app's colours and sizes, in one place. They match the dashboard's default look:
- * near-black on white, and the reverse in the dark. Change them here and every screen follows.
+ * Juice Me's colours: mango orange for what you press, passion-fruit purple as the accent,
+ * dark roast brown for text, on a warm cream. The dark version is the same fruit at night.
+ * Change them here and every screen follows.
  */
 const light = {
-  background: "#ffffff",
-  surface: "#f6f6f7",
-  border: "#e5e5e7",
-  text: "#0a0a0a",
-  muted: "#6b7280",
+  background: "#FFFBF4",
+  surface: "#FFF4E0",
+  border: "#F1E2C6",
+  text: "#3B1F0E",
+  muted: "#8A6A55",
   /** Buttons and the active tab. */
-  brand: "#0a0a0a",
+  brand: "#D9480F",
   onBrand: "#ffffff",
-  danger: "#dc2626",
-  success: "#16a34a",
-  /** Charts, the icons on cards, the active tab: the one colour among the greys. */
-  accent: "#4f46e5",
-  accentSoft: "#eef2ff",
+  danger: "#C92A2A",
+  success: "#2F9E44",
+  /** Charts, the icons on cards, the active tab: the one colour among the creams. */
+  accent: "#7B2D8E",
+  accentSoft: "#F3E8F7",
   tabBar: "#ffffff",
 };
 
 const dark: typeof light = {
-  background: "#0a0a0a",
-  surface: "#18181b",
-  border: "#27272a",
-  text: "#fafafa",
-  muted: "#9ca3af",
-  brand: "#fafafa",
-  onBrand: "#0a0a0a",
-  danger: "#f87171",
-  success: "#4ade80",
-  accent: "#818cf8",
-  accentSoft: "#1e1b4b",
-  tabBar: "#18181b",
+  background: "#1F1208",
+  surface: "#2B1B0F",
+  border: "#3D2A1B",
+  text: "#FFF4E0",
+  muted: "#C9A98F",
+  brand: "#FF9F1C",
+  onBrand: "#1F1208",
+  danger: "#FF6B6B",
+  success: "#51CF66",
+  accent: "#D49BE3",
+  accentSoft: "#3A1F44",
+  tabBar: "#2B1B0F",
 };
 
 export type Colors = typeof light;

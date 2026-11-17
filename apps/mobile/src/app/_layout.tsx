@@ -1,9 +1,10 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useColorScheme } from "react-native";
 
+import { Intro } from "@/components/intro";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { ResourcesProvider } from "@/lib/resources";
@@ -17,6 +18,9 @@ SplashScreen.preventAutoHideAsync();
 loadAppearance().then((choice) => {
   if (choice !== "system") setAppearance(choice);
 });
+
+// The opening animation plays once each time the app starts, not on every return to it.
+let introPlayed = false;
 
 export default function RootLayout() {
   return (
@@ -34,6 +38,7 @@ function Screens() {
   const { user, loading } = useAuth();
   const colors = useColors();
   const dark = useColorScheme() === "dark";
+  const [intro, setIntro] = useState(!introPlayed);
 
   useEffect(() => {
     if (!loading) SplashScreen.hideAsync();
@@ -76,6 +81,14 @@ function Screens() {
           <Stack.Screen name="sign-up" options={{ headerShown: false }} />
         </Stack.Protected>
       </Stack>
+      {intro ? (
+        <Intro
+          onDone={() => {
+            introPlayed = true;
+            setIntro(false);
+          }}
+        />
+      ) : null}
     </ThemeProvider>
   );
 }

@@ -4,6 +4,7 @@ import { View } from "react-native";
 
 import { SecondStep } from "@/components/second-step";
 import { SocialButtons } from "@/components/social-buttons";
+import { Logo } from "@/components/logo";
 import { Body, Button, Field, Notice, Screen, Title } from "@/components/ui";
 import { ApiError, messageOf, SlowAnswerError } from "@/lib/api";
 import { signInMethods, useAuth, type Challenge } from "@/lib/auth";
@@ -136,6 +137,7 @@ export default function SignUp() {
   return (
     <Screen edges={["top", "bottom"]} centered>
       <View style={{ gap: spacing.xs }}>
+        <Logo />
         <Title>Create your account</Title>
         <Body muted>Join {site.name}. It takes a minute.</Body>
       </View>
