@@ -1,0 +1,13 @@
+{
+  "name": "juice-me",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "php nevela dev",
+    "nevela": "php nevela",
+    "dev:api": "cd apps/api && php artisan serve",
+    "dev:web": "cd apps/web && pnpm run dev",
+    "dev:mobile": "cd apps/mobile && npx expo start"
+  }
+}

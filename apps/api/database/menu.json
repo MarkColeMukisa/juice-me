@@ -1,0 +1,21 @@
+{
+  "categories": ["Juices", "Smoothies", "Shakes", "Coffee"],
+  "beverages": [
+    { "name": "Passion Fruit Juice", "category": "Juices", "price": 3000, "size": "medium", "description": "Fresh Ugandan passion fruit, pressed this morning. Sweet, sharp and very cold." },
+    { "name": "Mango Juice", "category": "Juices", "price": 4000, "size": "medium", "description": "Ripe Bukedea mangoes blended smooth, nothing added." },
+    { "name": "Pineapple Mint", "category": "Juices", "price": 4000, "size": "medium", "description": "Kayunga pineapple with a handful of fresh mint." },
+    { "name": "Watermelon Juice", "category": "Juices", "price": 3500, "size": "large", "description": "Light, pink and thirst-quenching for a hot afternoon on campus." },
+    { "name": "Mukwaju (Tamarind)", "category": "Juices", "price": 3500, "size": "medium", "description": "Tangy tamarind, sweetened just enough, with a little ginger." },
+    { "name": "Beetroot Ginger", "category": "Juices", "price": 4500, "size": "small", "description": "Beetroot, carrot, apple and a kick of ginger." },
+    { "name": "Banana Groundnut Smoothie", "category": "Smoothies", "price": 5500, "size": "medium", "description": "Sweet bananas, roasted groundnut paste and milk. A meal in a cup." },
+    { "name": "Avocado Smoothie", "category": "Smoothies", "price": 6000, "size": "medium", "description": "Creamy avocado with milk and a touch of honey." },
+    { "name": "Mango Passion Smoothie", "category": "Smoothies", "price": 5500, "size": "medium", "description": "Mango and passion fruit blended with yoghurt." },
+    { "name": "Fene (Jackfruit) Smoothie", "category": "Smoothies", "price": 6000, "size": "large", "description": "Jackfruit, banana and milk, thick and fragrant." },
+    { "name": "Vanilla Milkshake", "category": "Shakes", "price": 6000, "size": "medium", "description": "Vanilla ice cream and fresh milk, whipped thick." },
+    { "name": "Chocolate Shake", "category": "Shakes", "price": 6500, "size": "medium", "description": "Rich chocolate ice cream shake with cocoa on top." },
+    { "name": "Strawberry Shake", "category": "Shakes", "price": 6500, "size": "medium", "description": "Strawberries, ice cream and milk." },
+    { "name": "Bugisu Black Coffee", "category": "Coffee", "price": 3000, "size": "small", "description": "Arabica from the slopes of Mount Elgon, brewed strong." },
+    { "name": "Café Latte", "category": "Coffee", "price": 5000, "size": "medium", "description": "Bugisu espresso with steamed milk." },
+    { "name": "Iced Coffee", "category": "Coffee", "price": 5500, "size": "large", "description": "Cold espresso, milk and ice, for the walk to class." }
+  ]
+}

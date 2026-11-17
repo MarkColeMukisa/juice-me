@@ -1,0 +1,47 @@
+{
+    "$schema": "https://nevela.dev/schema/resource.v1.json",
+    "name": "Beverage",
+    "table": "beverages",
+    "slug": "beverages",
+    "label": "Beverage",
+    "pluralLabel": "Beverages",
+    "icon": "cup-soda",
+    "fields": {
+        "name": {
+            "kind": "string"
+        },
+        "description": {
+            "kind": "text",
+            "required": false
+        },
+        "price": {
+            "kind": "float",
+            "format": "money"
+        },
+        "size": {
+            "kind": "enum",
+            "options": [
+                "small",
+                "medium",
+                "large"
+            ],
+            "default": "medium"
+        },
+        "image": {
+            "kind": "file",
+            "accept": [
+                "image"
+            ],
+            "profile": "product",
+            "required": false
+        },
+        "categoryId": {
+            "kind": "belongsTo",
+            "target": "Category"
+        },
+        "available": {
+            "kind": "boolean",
+            "default": true
+        }
+    }
+}

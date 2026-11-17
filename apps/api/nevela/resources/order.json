@@ -1,0 +1,144 @@
+{
+    "$schema": "https://nevela.dev/schema/resource.v1.json",
+    "name": "Order",
+    "table": "orders",
+    "slug": "orders",
+    "label": "Order",
+    "pluralLabel": "Orders",
+    "icon": "shopping-bag",
+    "items": "OrderItem",
+    "owner": "email",
+    "fields": {
+        "number": {
+            "kind": "string",
+            "auto": "JM",
+            "unique": true
+        },
+        "customer": {
+            "kind": "string"
+        },
+        "email": {
+            "kind": "string",
+            "format": "email"
+        },
+        "phone": {
+            "kind": "string",
+            "format": "tel",
+            "required": false
+        },
+        "delivery": {
+            "kind": "enum",
+            "options": [
+                "collection",
+                "delivery"
+            ],
+            "default": "collection"
+        },
+        "details": {
+            "kind": "text",
+            "required": false
+        },
+        "status": {
+            "kind": "enum",
+            "options": [
+                "pending",
+                "accepted",
+                "preparing",
+                "ready",
+                "completed",
+                "cancelled"
+            ],
+            "default": "pending"
+        },
+        "total": {
+            "kind": "float",
+            "format": "money",
+            "required": false
+        }
+    },
+    "fixed": true,
+    "actions": {
+        "accept": {
+            "label": "Accept",
+            "icon": "check",
+            "when": {
+                "status": "pending"
+            },
+            "set": {
+                "status": "accepted"
+            }
+        },
+        "startPreparing": {
+            "label": "Start preparing",
+            "icon": "cup-soda",
+            "when": {
+                "status": "accepted"
+            },
+            "set": {
+                "status": "preparing"
+            }
+        },
+        "markReady": {
+            "label": "Ready",
+            "icon": "bell",
+            "when": {
+                "status": "preparing"
+            },
+            "set": {
+                "status": "ready"
+            }
+        },
+        "complete": {
+            "label": "Complete",
+            "icon": "check-check",
+            "when": {
+                "status": "ready"
+            },
+            "set": {
+                "status": "completed"
+            }
+        },
+        "cancel": {
+            "label": "Cancel order",
+            "icon": "x",
+            "confirm": "Cancel this order?",
+            "when": {
+                "status": [
+                    "pending",
+                    "accepted",
+                    "preparing",
+                    "ready"
+                ]
+            },
+            "set": {
+                "status": "cancelled"
+            },
+            "fields": {
+                "reason": {
+                    "kind": "text",
+                    "required": false
+                }
+            }
+        },
+        "callOff": {
+            "label": "Cancel with a reason",
+            "icon": "ban",
+            "when": {
+                "status": [
+                    "pending",
+                    "accepted",
+                    "preparing",
+                    "ready"
+                ]
+            },
+            "set": {
+                "status": "cancelled"
+            },
+            "fields": {
+                "reason": {
+                    "kind": "text"
+                }
+            }
+        }
+    }
+}

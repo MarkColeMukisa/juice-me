@@ -1,0 +1,131 @@
+import type { NextRequest } from "next/server";
+import { API_URL, callerHeaders, sessionToken } from "@/lib/laravel";
+
+/**
+ * The browser's way to the Laravel API, for the few things a server action can't do:
+ *
+ * - reading, for the relation picker's search (`/api/categories?q=…`),
+ * - showing stored files (`/api/_nevela/files/<key>`),
+ * - downloading a private one (`/api/_nevela/private/<slug>/<id>/<field>`), which Laravel
+ *   hands only to someone who may view that record, and
+ * - uploading one (`PUT /api/_nevela/uploads/<Resource>/<field>`), which needs the
+ *   browser's upload progress and is larger than a server action accepts.
+ *
+ * The token stays in its httpOnly cookie: it is read here, on the server, and sent on
+ * as a Bearer token. Laravel still decides what the person may see or store. Everything
+ * else that changes data goes through the server actions, so nothing but an upload is
+ * let through here as a write.
+ *
+ * And for a site's visitors, who have no session: what a resource's "public" section
+ * opens (`/api/public/…`). Reading it, a form's create (`POST /api/public/<slug>`) and a
+ * file for that form (`PUT /api/public/<slug>/_uploads/<field>`) go through
+ * with no token. Laravel has those routes only for resources whose descriptor opens them.
+ */
+export const dynamic = "force-dynamic";
+
+/** Larger than any field allows; Laravel enforces the real limit. This only stops a runaway request early. */
+const MAX_UPLOAD_BYTES = 64 * 1024 * 1024;
+
+/**
+ * What is passed back from Laravel's answer. Not its length or encoding: fetch() hands
+ * over the body already decompressed, so the length Laravel gave may no longer be true.
+ */
+const RESPONSE_HEADERS = ["content-type", "content-disposition", "cache-control", "etag", "last-modified", "location", "x-content-type-options"];
+
+type Context = { params: Promise<{ path: string[] }> };
+
+function target(path: string[], search: string): string | null {
+  if (path.some((segment) => segment === "" || segment === "." || segment === "..")) return null;
+  return `${API_URL}/${path.map(encodeURIComponent).join("/")}${search}`;
+}
+
+/** Whether an address is under what a resource's "public" section opens. */
+const isPublic = (path: string[]) => path[0] === "public" && path.length > 1;
+
+async function forward(url: string, init: RequestInit, withToken: boolean, forVisitor = false): Promise<Response> {
+  const headers = new Headers(init.headers);
+  headers.set("Accept", headers.get("Accept") ?? "application/json");
+  const token = withToken ? await sessionToken() : undefined;
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  // Whose request this is, so Laravel's throttle counts the visitor and not this server.
+  if (forVisitor) for (const [name, value] of Object.entries(await callerHeaders())) headers.set(name, value);
+
+  let upstream: Response;
+  try {
+    upstream = await fetch(url, { ...init, headers, cache: "no-store", redirect: "manual" });
+  } catch {
+    return Response.json({ error: "Can't reach the API. Is the Laravel app running?" }, { status: 502 });
+  }
+  const passed = new Headers();
+  for (const name of RESPONSE_HEADERS) {
+    const value = upstream.headers.get(name);
+    if (value) passed.set(name, value);
+  }
+  return new Response(upstream.status === 204 || upstream.status === 304 ? null : upstream.body, { status: upstream.status, headers: passed });
+}
+
+export async function GET(request: NextRequest, context: Context) {
+  const { path } = await context.params;
+  const url = target(path, request.nextUrl.search);
+  if (!url) return Response.json({ error: "Not found." }, { status: 404 });
+
+  // Stored files are public and cacheable, so they are asked for without the token.
+  const isFile = path[0] === "_nevela" && path[1] === "files";
+  const conditional: Record<string, string> = {};
+  for (const name of ["if-none-match", "if-modified-since"]) {
+    const value = request.headers.get(name);
+    if (value) conditional[name] = value;
+  }
+  // The API's answers are JSON, whatever the browser said it would accept. Asked that way,
+  // a request with no session is told 401; asked as a page, Laravel would try to send it
+  // to a sign-in route this app doesn't have. A file is asked for as the browser wants it.
+  const accept = isFile ? (request.headers.get("accept") ?? "*/*") : "application/json";
+  // What is public is the same for everyone, so it is asked for as nobody.
+  return forward(url, { method: "GET", headers: { Accept: accept, ...conditional } }, !isFile && !isPublic(path), isPublic(path));
+}
+
+/**
+ * A visitor's form: a public create. Nothing else is posted this way. A signed-in
+ * person's saves go through the dashboard's server actions.
+ */
+export async function POST(request: NextRequest, context: Context) {
+  const { path } = await context.params;
+  const url = target(path, request.nextUrl.search);
+  if (!url || path.length !== 2 || path[0] !== "public" || path[1].startsWith("_")) {
+    return Response.json({ error: "Only a public form is sent this way. Records are saved through the dashboard." }, { status: 405 });
+  }
+  const length = Number(request.headers.get("content-length") ?? 0);
+  if (length > 1024 * 1024) return Response.json({ error: "That is too much to send." }, { status: 413 });
+  const body = await request.text();
+  if (body.length > 1024 * 1024) return Response.json({ error: "That is too much to send." }, { status: 413 });
+  return forward(url, { method: "POST", body, headers: { "Content-Type": "application/json" } }, false, true);
+}
+
+export async function PUT(request: NextRequest, context: Context) {
+  const { path } = await context.params;
+  const url = target(path, request.nextUrl.search);
+  // A visitor's file for a public form: /api/public/_nevela/uploads/<Resource>/<field>,
+  // or by the form's own address, /api/public/<slug>/_uploads/<field>.
+  const forVisitor =
+    path[0] === "public" &&
+    ((path.length === 5 && path[1] === "_nevela" && path[2] === "uploads") || (path.length === 4 && !path[1].startsWith("_") && path[2] === "_uploads"));
+  if (!url || !(forVisitor || (path[0] === "_nevela" && path[1] === "uploads"))) {
+    return Response.json({ error: "Only uploads are sent this way. Records are saved through the dashboard." }, { status: 405 });
+  }
+  // Nothing is read until it is known who is sending it and how much there is. (A visitor
+  // is nobody, by design: Laravel takes their file only for a field a public form lists.)
+  if (!forVisitor && !(await sessionToken())) return Response.json({ error: "Sign in first." }, { status: 401 });
+  const length = Number(request.headers.get("content-length"));
+  if (!Number.isFinite(length) || length <= 0) return Response.json({ error: "The upload didn't say how large it is." }, { status: 411 });
+  if (length > MAX_UPLOAD_BYTES) {
+    return Response.json({ error: "That file is too large to upload." }, { status: 413 });
+  }
+
+  // Read whole, then sent with its length: PHP's development server can't take a body
+  // that arrives in chunks, which is how a stream would be passed on.
+  const body = await request.arrayBuffer();
+  if (body.byteLength > MAX_UPLOAD_BYTES) {
+    return Response.json({ error: "That file is too large to upload." }, { status: 413 });
+  }
+  return forward(url, { method: "PUT", body, headers: { "Content-Type": request.headers.get("content-type") ?? "application/octet-stream" } }, !forVisitor, forVisitor);
+}

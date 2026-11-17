@@ -1,0 +1,57 @@
+{
+    "$schema": "https://nevela.dev/schema/resource.v1.json",
+    "name": "Post",
+    "table": "posts",
+    "slug": "posts",
+    "label": "Post",
+    "pluralLabel": "Posts",
+    "icon": "book",
+    "group": "Blog",
+    "publish": "publishedAt",
+    "blog": "/blog",
+    "fields": {
+        "title": {
+            "kind": "string"
+        },
+        "slug": {
+            "kind": "string",
+            "format": "slug",
+            "from": "title",
+            "unique": true
+        },
+        "excerpt": {
+            "kind": "string",
+            "maxLength": 500,
+            "required": false
+        },
+        "body": {
+            "kind": "text",
+            "format": "rich"
+        },
+        "image": {
+            "kind": "file",
+            "accept": [
+                "image"
+            ],
+            "profile": "cover",
+            "required": false
+        },
+        "publishedAt": {
+            "kind": "datetime",
+            "required": false
+        }
+    },
+    "public": {
+        "read": {
+            "by": "slug",
+            "fields": [
+                "title",
+                "slug",
+                "excerpt",
+                "body",
+                "image",
+                "publishedAt"
+            ]
+        }
+    }
+}

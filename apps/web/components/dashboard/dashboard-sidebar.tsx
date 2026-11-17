@@ -1,0 +1,268 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ActivityIcon, LayoutDashboardIcon, ShieldCheckIcon, Trash2Icon, UserCircleIcon, UserXIcon, UsersIcon } from "lucide-react";
+import { ChevronsUpDownIcon } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+} from "@/components/ui/sidebar";
+import { resourceIcon } from "./resource-icon";
+import { UserAvatar, UserMenuItems, type DashboardUser } from "./user-menu";
+
+export interface NavResource {
+  name: string;
+  pluralLabel: string;
+  slug: string;
+  icon?: string;
+  /** Heading it sits under, from the descriptor's `group`. */
+  group?: string;
+  /** Optional count badge (off by default). */
+  badge?: number;
+  /** This person's saved views of the resource, as "?q=…&filter[…]=…". */
+  views?: { id: string; name: string; query: string }[];
+}
+
+/**
+ * Resources grouped by their heading. User-created resources (those without a `group`)
+ * appear first under "Resources", followed by system-provided groups like "Blog". This
+ * visual separation helps users distinguish what they created from what came with the app.
+ */
+function byGroup(resources: NavResource[]): [string, NavResource[], boolean][] {
+  const userCreated: NavResource[] = [];
+  const systemGroups = new Map<string, NavResource[]>();
+  
+  for (const resource of resources) {
+    if (!resource.group?.trim()) {
+      // No group = user created with `nevela resource`
+      userCreated.push(resource);
+    } else {
+      // Has a group = system-provided (like Blog) or explicitly grouped
+      const heading = resource.group.trim();
+      const existing = systemGroups.get(heading);
+      if (existing) existing.push(resource);
+      else systemGroups.set(heading, [resource]);
+    }
+  }
+  
+  const result: [string, NavResource[], boolean][] = [];
+  
+  // User-created resources first, marked as user-created
+  if (userCreated.length > 0) {
+    result.push(["Resources", userCreated, false]);
+  }
+  
+  // System groups after, marked as system-provided
+  for (const [heading, group] of systemGroups) {
+    result.push([heading, group, true]);
+  }
+  
+  return result;
+}
+
+/**
+ * Sidebar navigation, one item per registered resource. The icon comes from the
+ * descriptor's `icon`, the label from its plural label, and the active item from the
+ * current path.
+ */
+/** Sections every dashboard has, whatever resources the app defines. */
+const ACCOUNT_LINKS: { href: string; label: string; icon: typeof ActivityIcon }[] = [{ href: "/dashboard/account", label: "Account", icon: UserCircleIcon }];
+// Empty for now: the observability pages return once Laravel serves them.
+const ADMIN_LINKS: typeof ACCOUNT_LINKS = [];
+
+export function DashboardSidebar({
+  appName,
+  resources,
+  links = [],
+  isAdmin = false,
+  access = { users: false, roles: false, deleted: false },
+  trash = false,
+  user,
+}: {
+  appName: string;
+  resources: NavResource[];
+  /** Extra pages (see lib/dashboard-nav.ts), shown under "Platform". */
+  links?: Array<{ label: string; href: string; icon: string }>;
+  /** Whether to show the sections that manage the app itself. */
+  isAdmin?: boolean;
+  /** Which of the screens for managing people this person may open. */
+  access?: { users: boolean; roles: boolean; deleted?: boolean; activity?: boolean };
+  /** Whether this person may delete anything, and so has a trash to look in. */
+  trash?: boolean;
+  user: DashboardUser;
+}) {
+  const pathname = usePathname();
+  // A saved view is the query it was saved with, so the one you're on is the one that matches.
+  const search = useSearchParams().toString();
+  const manage = [
+    ...ACCOUNT_LINKS,
+    ...(access.users ? [{ href: "/dashboard/access/users", label: "Users", icon: UsersIcon }] : []),
+    ...(access.roles ? [{ href: "/dashboard/access/roles", label: "Roles", icon: ShieldCheckIcon }] : []),
+    ...(access.deleted ? [{ href: "/dashboard/access/deleted", label: "Deleted accounts", icon: UserXIcon }] : []),
+    ...(trash ? [{ href: "/dashboard/trash", label: "Trash", icon: Trash2Icon }] : []),
+    ...(access.activity ? [{ href: "/dashboard/activity", label: "Activity", icon: ActivityIcon }] : []),
+    ...(isAdmin ? ADMIN_LINKS : []),
+  ];
+
+  return (
+    <Sidebar collapsible="icon">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild size="lg" tooltip={appName}>
+              <Link href="/dashboard">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                  <LayoutDashboardIcon className="size-4" />
+                </div>
+                <span className="truncate font-semibold">{appName}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/dashboard"} tooltip="Overview">
+                  <Link href="/dashboard">
+                    <LayoutDashboardIcon />
+                    <span>Overview</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {byGroup(resources).map(([heading, group, isSystem]) => (
+          <SidebarGroup key={heading} className={isSystem ? "mt-2 pt-2 border-t" : ""}>
+            <SidebarGroupLabel className={isSystem ? "text-muted-foreground/70" : ""}>{heading}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.map((resource) => {
+                  const href = `/dashboard/${resource.slug}`;
+                  const Icon = resourceIcon(resource.icon);
+                  return (
+                    <SidebarMenuItem key={resource.name}>
+                      <SidebarMenuButton asChild isActive={pathname === href || pathname.startsWith(`${href}/`)} tooltip={resource.pluralLabel}>
+                        <Link href={href}>
+                          <Icon />
+                          <span>{resource.pluralLabel}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                      {resource.views && resource.views.length > 0 && (
+                        <SidebarMenuSub>
+                          {resource.views.map((view) => (
+                            <SidebarMenuSubItem key={view.id}>
+                              <SidebarMenuSubButton asChild isActive={pathname === href && search === view.query}>
+                                <Link href={`${href}?${view.query}`}>
+                                  <span>{view.name}</span>
+                                </Link>
+                              </SidebarMenuSubButton>
+                            </SidebarMenuSubItem>
+                          ))}
+                        </SidebarMenuSub>
+                      )}
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+
+        {manage.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Manage</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {manage.map((link) => (
+                  <SidebarMenuItem key={link.href}>
+                    <SidebarMenuButton asChild isActive={pathname === link.href || pathname.startsWith(`${link.href}/`)} tooltip={link.label}>
+                      <Link href={link.href}>
+                        <link.icon />
+                        <span>{link.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {links.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {links.map((link) => {
+                  const Icon = resourceIcon(link.icon);
+                  // Route handlers (/api/...) and other sites are whole pages: open them in a new tab.
+                  const external = link.href.startsWith("/api/") || /^https?:\/\//.test(link.href);
+                  const content = (
+                    <>
+                      <Icon />
+                      <span>{link.label}</span>
+                    </>
+                  );
+                  return (
+                    <SidebarMenuItem key={link.href}>
+                      <SidebarMenuButton asChild isActive={pathname === link.href || pathname.startsWith(`${link.href}/`)} tooltip={link.label}>
+                        {external ? (
+                          <a href={link.href} target="_blank" rel="noreferrer">
+                            {content}
+                          </a>
+                        ) : (
+                          <Link href={link.href}>{content}</Link>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+      </SidebarContent>
+
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton size="lg" tooltip={user.email}>
+                  <UserAvatar user={user} className="size-8 rounded-md" />
+                  <span className="grid min-w-0 flex-1 text-left leading-tight">
+                    <span className="truncate text-sm font-medium">{user.name || "Signed in"}</span>
+                    <span className="truncate text-xs text-muted-foreground">{user.email}</span>
+                  </span>
+                  <ChevronsUpDownIcon className="ml-auto" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start" className="w-60">
+                <UserMenuItems user={user} />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}

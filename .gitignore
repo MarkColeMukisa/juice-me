@@ -1,0 +1,10 @@
+node_modules/
+vendor/
+.env
+.env.*
+!.env.example
+.next/
+*.tsbuildinfo
+next-env.d.ts
+.expo/
+expo-env.d.ts

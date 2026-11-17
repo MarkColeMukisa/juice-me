@@ -1,0 +1,22 @@
+{
+    "$schema": "https://nevela.dev/schema/resource.v1.json",
+    "name": "Category",
+    "table": "categories",
+    "slug": "categories",
+    "label": "Category",
+    "pluralLabel": "Categories",
+    "icon": "tags",
+    "fields": {
+        "name": {
+            "kind": "string",
+            "unique": true
+        },
+        "image": {
+            "kind": "file",
+            "accept": [
+                "image"
+            ],
+            "required": false
+        }
+    }
+}

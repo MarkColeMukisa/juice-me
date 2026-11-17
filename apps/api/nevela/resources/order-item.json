@@ -1,0 +1,26 @@
+{
+    "$schema": "https://nevela.dev/schema/resource.v1.json",
+    "name": "OrderItem",
+    "table": "order_items",
+    "slug": "order-items",
+    "label": "Order item",
+    "pluralLabel": "Order items",
+    "fields": {
+        "beverageId": {
+            "kind": "belongsTo",
+            "target": "Beverage"
+        },
+        "quantity": {
+            "kind": "int"
+        },
+        "price": {
+            "kind": "float",
+            "format": "money",
+            "from": "beverageId.price"
+        },
+        "orderId": {
+            "kind": "belongsTo",
+            "target": "Order"
+        }
+    }
+}
