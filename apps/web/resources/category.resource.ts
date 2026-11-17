@@ -5,7 +5,7 @@
 import { defineResource, field } from "@flaredev/core";
 
 export default defineResource({
-  // nevela:generated:start hash=51eb19ff508e
+  // nevela:generated:start hash=c0cbac2dfe40
   name: "Category",
   table: "categories",
   slug: "categories",
@@ -15,6 +15,7 @@ export default defineResource({
   fields: {
     name: field.string({ unique: true }),
     image: field.file(["image"], { required: false, list: true }),
+    banners: field.hasMany("Banner", { foreignKey: "categoryId" }),
     beverages: field.hasMany("Beverage", { foreignKey: "categoryId" }),
   },
   // nevela:generated:end

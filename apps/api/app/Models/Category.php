@@ -11,7 +11,7 @@ class Category extends Model
 
     protected $table = 'categories';
 
-    // nevela:generated:start hash=af27a808da39
+    // nevela:generated:start hash=56fdd07a79e2
     // Deleted records go to the trash, where they can be restored for a while.
     use \Nevela\Laravel\Concerns\Trashable;
 
@@ -22,6 +22,11 @@ class Category extends Model
         return [
 
         ];
+    }
+
+    public function banners(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Banner::class, 'category_id');
     }
 
     public function beverages(): \Illuminate\Database\Eloquent\Relations\HasMany

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { RefreshControl, View } from "react-native";
 
 import { HomeHeader, NothingShared } from "@/components/home-header";
-import { ShopHome } from "@/components/shop-home";
+import { JuiceHome } from "@/components/juice-home";
 import { Card, Heading, Notice, Row, Screen } from "@/components/ui";
 import { messageOf } from "@/lib/api";
 import { useShop } from "@/lib/cart";
@@ -19,7 +19,7 @@ import { loadInbox } from "@/app/notifications";
  */
 export function CustomerHome() {
   const shop = useShop();
-  return shop ? <ShopHome shop={shop} /> : <Browse />;
+  return shop ? <JuiceHome shop={shop} /> : <Browse />;
 }
 
 /**

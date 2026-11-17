@@ -42,6 +42,10 @@
         "available": {
             "kind": "boolean",
             "default": true
+        },
+        "featured": {
+            "kind": "boolean",
+            "default": false
         }
     }
 }

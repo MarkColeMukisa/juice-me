@@ -1,0 +1,38 @@
+{
+    "$schema": "https://nevela.dev/schema/resource.v1.json",
+    "name": "Banner",
+    "table": "banners",
+    "slug": "banners",
+    "label": "Banner",
+    "pluralLabel": "Banners",
+    "icon": "image",
+    "fields": {
+        "title": {
+            "kind": "string"
+        },
+        "subtitle": {
+            "kind": "string",
+            "required": false
+        },
+        "image": {
+            "kind": "file",
+            "accept": [
+                "image"
+            ],
+            "required": false
+        },
+        "categoryId": {
+            "kind": "belongsTo",
+            "target": "Category",
+            "required": false
+        },
+        "active": {
+            "kind": "boolean",
+            "default": true
+        },
+        "position": {
+            "kind": "int",
+            "default": 0
+        }
+    }
+}

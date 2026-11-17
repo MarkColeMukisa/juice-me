@@ -14,7 +14,7 @@ class BeverageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            // nevela:generated:start hash=482c76eb1f96
+            // nevela:generated:start hash=14ef2878e5be
             'name' => $this->name,
             'description' => $this->description,
             'price' => $this->price,
@@ -23,6 +23,7 @@ class BeverageResource extends JsonResource
             'imageFile' => \Nevela\Laravel\Nevela::file($this->image),
             'categoryId' => $this->category_id,
             'available' => $this->available,
+            'featured' => $this->featured,
             // nevela:generated:end
             'createdAt' => $this->created_at?->toJSON(),
             'updatedAt' => $this->updated_at?->toJSON(),

@@ -11,19 +11,20 @@ class Beverage extends Model
 
     protected $table = 'beverages';
 
-    // nevela:generated:start hash=3dd0424d0f30
+    // nevela:generated:start hash=5ce29d06fa78
     // Deleted records go to the trash, where they can be restored for a while.
     use \Nevela\Laravel\Concerns\Trashable;
     // $record->optionLabel('status'): what its value is called, in the dashboard's words.
     use \Nevela\Laravel\Concerns\OptionLabels;
 
-    protected $fillable = ['name', 'description', 'price', 'size', 'image', 'category_id', 'available'];
+    protected $fillable = ['name', 'description', 'price', 'size', 'image', 'category_id', 'available', 'featured'];
 
     protected function casts(): array
     {
         return [
             'price' => 'float',
             'available' => 'boolean',
+            'featured' => 'boolean',
         ];
     }
 

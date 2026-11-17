@@ -4,7 +4,11 @@ use Illuminate\Support\Facades\Route;
 
 // Loaded by Nevela under the prefix and middleware in config/nevela.php
 // (default: /api, auth:sanctum). Add your own routes below the generated block.
-// nevela:generated:start hash=59de6a5b897d
+// nevela:generated:start hash=65bb8b7ce678
+Route::get('banners/_stats', [\App\Http\Controllers\Api\BannerController::class, 'stats'])->name('banners.stats');
+Route::get('banners/_insights', [\App\Http\Controllers\Api\BannerController::class, 'insights'])->name('banners.insights');
+Route::post('banners/_bulk', [\App\Http\Controllers\Api\BannerController::class, 'bulk'])->name('banners.bulk');
+Route::apiResource('banners', \App\Http\Controllers\Api\BannerController::class);
 Route::get('beverages/_stats', [\App\Http\Controllers\Api\BeverageController::class, 'stats'])->name('beverages.stats');
 Route::get('beverages/_insights', [\App\Http\Controllers\Api\BeverageController::class, 'insights'])->name('beverages.insights');
 Route::post('beverages/_bulk', [\App\Http\Controllers\Api\BeverageController::class, 'bulk'])->name('beverages.bulk');

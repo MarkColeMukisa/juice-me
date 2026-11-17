@@ -22,7 +22,7 @@ class BeverageRequest extends ResourceRequest
             : Gate::allows('create', Beverage::class);
     }
 
-    // nevela:generated:start hash=a5684e826798
+    // nevela:generated:start hash=c37928c9efd5
     public function rules(): array
     {
         $beverage = $this->route('beverage');
@@ -35,18 +35,19 @@ class BeverageRequest extends ResourceRequest
             'image' => ['nullable', 'string', 'max:512', new \Nevela\Laravel\Rules\UploadKey('Beverage', 'image')],
             'categoryId' => ['required', 'uuid', Rule::exists('categories', 'id')],
             'available' => ['sometimes', 'required', 'boolean'],
+            'featured' => ['sometimes', 'required', 'boolean'],
         ];
     }
 
     protected function columns(): array
     {
-        return ['name' => 'name', 'description' => 'description', 'price' => 'price', 'size' => 'size', 'image' => 'image', 'categoryId' => 'category_id', 'available' => 'available'];
+        return ['name' => 'name', 'description' => 'description', 'price' => 'price', 'size' => 'size', 'image' => 'image', 'categoryId' => 'category_id', 'available' => 'available', 'featured' => 'featured'];
     }
 
     /** What a field is when a create leaves it out. */
     protected function defaults(): array
     {
-        return ['size' => 'medium', 'available' => true];
+        return ['size' => 'medium', 'available' => true, 'featured' => false];
     }
     // nevela:generated:end
 }

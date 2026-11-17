@@ -1,13 +1,14 @@
 // Registry of every resource descriptor (maintained by `php artisan nevela:generate`).
-// nevela:generated:start hash=adf04d83a9f7
+// nevela:generated:start hash=b198e0ca1fd1
+import bannerResource from "./banner.resource";
 import beverageResource from "./beverage.resource";
 import categoryResource from "./category.resource";
 import orderResource from "./order.resource";
 import orderItemResource from "./order-item.resource";
 import postResource from "./post.resource";
 
-export { beverageResource, categoryResource, orderResource, orderItemResource, postResource };
-export const resources = [beverageResource, categoryResource, orderResource, orderItemResource, postResource] as const;
+export { bannerResource, beverageResource, categoryResource, orderResource, orderItemResource, postResource };
+export const resources = [bannerResource, beverageResource, categoryResource, orderResource, orderItemResource, postResource] as const;
 
 /** What a resource has beyond its fields. Read through lib/extras.ts. */
 export const extras: Record<string, unknown> = {

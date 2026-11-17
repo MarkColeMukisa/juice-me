@@ -1,0 +1,209 @@
+[
+  {
+    "kind": "beverage",
+    "name": "Passion Fruit Juice",
+    "file": "beverage-Passion-Fruit-Juice.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Siem_Reap_iced_passion_fruit_juice_(5057850765).jpg",
+    "title": "Siem Reap iced passion fruit juice (5057850765).jpg",
+    "author": "@felixtriller from Cologne, Germany",
+    "licence": "CC BY 2.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Mango Juice",
+    "file": "beverage-Mango-Juice.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Rubicon_mango_drink.jpg",
+    "title": "Rubicon mango drink.jpg",
+    "author": "Mx. Granger",
+    "licence": "CC0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Pineapple Mint",
+    "file": "beverage-Pineapple-Mint.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Pineapple_Juice_in_Glass_Jar.jpg",
+    "title": "Pineapple Juice in Glass Jar.jpg",
+    "author": "Srini297",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Watermelon Juice",
+    "file": "beverage-Watermelon-Juice.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:20160812-AMS-LSC-0169_(28963014995).jpg",
+    "title": "20160812-AMS-LSC-0169 (28963014995).jpg",
+    "author": "U.S. Department of Agriculture Lance Cheung/Multimedia PhotoJournalist",
+    "licence": "Public domain"
+  },
+  {
+    "kind": "beverage",
+    "name": "Mukwaju (Tamarind)",
+    "file": "beverage-Mukwaju-Tamarind.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Fresh_Tamarind_Juice.jpg",
+    "title": "Fresh Tamarind Juice.jpg",
+    "author": "Catherine Amia",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Beetroot Ginger",
+    "file": "beverage-Beetroot-Ginger.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Juice_af_%C3%A6bler,_r%C3%B8dbede,_guler%C3%B8dder,_grape_og_ingef%C3%A6r_(5022924772).jpg",
+    "title": "Juice af æbler, rødbede, gulerødder, grape og ingefær (5022924772).jpg",
+    "author": "cyclonebill from Copenhagen, Denmark",
+    "licence": "CC BY-SA 2.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Banana Groundnut Smoothie",
+    "file": "beverage-Banana-Groundnut-Smoothie.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Bananas_Foster_Shake_-_Good_Stuff_Eatery.jpg",
+    "title": "Bananas Foster Shake - Good Stuff Eatery.jpg",
+    "author": "Kim",
+    "licence": "CC BY-SA 2.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Avocado Smoothie",
+    "file": "beverage-Avocado-Smoothie.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Avocado,_milk,_condensed_milk_and_ice_smoothies_-_Amazing_Chef_food_processor.jpg",
+    "title": "Avocado, milk, condensed milk and ice smoothies - Amazing Chef food processor.jpg",
+    "author": "Alpha from Melbourne, Australia",
+    "licence": "CC BY-SA 2.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Mango Passion Smoothie",
+    "file": "beverage-Mango-Passion-Smoothie.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Tasty_Mango_lassi_picture.JPG",
+    "title": "Tasty Mango lassi picture.JPG",
+    "author": "Nithyasrm",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Fene (Jackfruit) Smoothie",
+    "file": "beverage-Fene-Jackfruit-Smoothie.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Jackfruit_Seed_Shake_Kerala_20190414_220040.jpg",
+    "title": "Jackfruit Seed Shake Kerala 20190414 220040.jpg",
+    "author": "Dr. Chinchu. C",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Vanilla Milkshake",
+    "file": "beverage-Vanilla-Milkshake.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Vanilla_milkshake_at_Lunchbox_Laboratories.jpg",
+    "title": "Vanilla milkshake at Lunchbox Laboratories.jpg",
+    "author": "jencu from bay area, usa",
+    "licence": "CC BY 2.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Chocolate Shake",
+    "file": "beverage-Chocolate-Shake.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:GLASS_OF_HAPPINESS.jpg",
+    "title": "GLASS OF HAPPINESS.jpg",
+    "author": "Elakkiya Loganayaki",
+    "licence": "CC0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Strawberry Shake",
+    "file": "beverage-Strawberry-Shake.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Milkshake_beverage_strawberry_drink-1021027.jpg",
+    "title": "Milkshake beverage strawberry drink-1021027.jpg",
+    "author": "Jakub Kapušňák",
+    "licence": "CC0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Bugisu Black Coffee",
+    "file": "beverage-Bugisu-Black-Coffee.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:A_small_cup_of_coffee.JPG",
+    "title": "A small cup of coffee.JPG",
+    "author": "Julius Schorzman",
+    "licence": "CC BY-SA 2.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Café Latte",
+    "file": "beverage-Caf-Latte.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Caff%C3%A8_Latte_at_Sainsbury%27s_Low_Hall,_Chingford,_London_1.jpg",
+    "title": "Caffè Latte at Sainsbury's Low Hall, Chingford, London 1.jpg",
+    "author": "Acabashi",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "beverage",
+    "name": "Iced Coffee",
+    "file": "beverage-Iced-Coffee.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Iced_B%E1%BA%A1c_X%E1%BB%89u_served_in_tall_glass_on_the_table_in_tha_cafe,_Danang_city,_2023.jpg",
+    "title": "Iced Bạc Xỉu served in tall glass on the table in tha cafe, Danang city, 2023.jpg",
+    "author": "Klientos",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "category",
+    "name": "Juices",
+    "file": "category-Juices.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Orange_juice.jpg",
+    "title": "Orange juice.jpg",
+    "author": "Scott Bauer, U.S. Department of Agriculture",
+    "licence": "Public domain"
+  },
+  {
+    "kind": "category",
+    "name": "Smoothies",
+    "file": "category-Smoothies.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Fruit_smoothie.jpg",
+    "title": "Fruit smoothie.jpg",
+    "author": "Tiia Monto",
+    "licence": "CC BY-SA 3.0"
+  },
+  {
+    "kind": "category",
+    "name": "Shakes",
+    "file": "category-Shakes.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Strawberry_milk_shake_(cropped).jpg",
+    "title": "Strawberry milk shake (cropped).jpg",
+    "author": "Renee Comet (Photographer)",
+    "licence": "Public domain"
+  },
+  {
+    "kind": "category",
+    "name": "Coffee",
+    "file": "category-Coffee.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Coffee_cup_and_coffee_bean.jpg",
+    "title": "Coffee cup and coffee bean.jpg",
+    "author": "mcfoodie",
+    "licence": "CC0"
+  },
+  {
+    "kind": "banner",
+    "name": "Fresh from the fruit",
+    "file": "banner-Fresh-from-the-fruit.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Assorted_Mocktails.jpg",
+    "title": "Assorted Mocktails.jpg",
+    "author": "Subrata Ghose",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "banner",
+    "name": "Smoothies, made to order",
+    "file": "banner-Smoothies-made-to-order.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:-14.c._-GEOlaviva_-Webbild_-_-Smoothies_-greensmothies_-cleaneating_-rawfood_-Superfood.jpg",
+    "title": "-14.c. -GEOlaviva -Webbild - -Smoothies -greensmothies -cleaneating -rawfood -Superfood.jpg",
+    "author": "GEOlaviva",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "kind": "banner",
+    "name": "Bugisu coffee, all day",
+    "file": "banner-Bugisu-coffee-all-day.jpg",
+    "source": "https://commons.wikimedia.org/wiki/File:Cup_of_coffee_surrounded_by_beans.jpg",
+    "title": "Cup of coffee surrounded by beans.jpg",
+    "author": "Zacharias Korsalka from Vienna, Austria",
+    "licence": "Public domain"
+  }
+]
