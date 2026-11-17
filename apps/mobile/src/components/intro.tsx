@@ -34,7 +34,7 @@ export function Intro({ onDone }: { onDone: () => void }) {
   const shown = useSharedValue(1);
 
   const finish = () => {
-    shown.value = withTiming(0, { duration: 320 }, (done) => {
+    shown.value = withTiming(0, { duration: 450 }, (done) => {
       if (done) runOnJS(onDone)();
     });
   };
@@ -44,13 +44,13 @@ export function Intro({ onDone }: { onDone: () => void }) {
       const timer = setTimeout(finish, 900);
       return () => clearTimeout(timer);
     }
-    glass.value = withSpring(1, { damping: 12, stiffness: 140 });
-    level.value = withDelay(350, withTiming(FULL, { duration: 950, easing: Easing.out(Easing.cubic) }));
-    straw.value = withDelay(1050, withSpring(1, { damping: 10, stiffness: 160 }));
-    leaf.value = withDelay(1250, withSequence(withSpring(1.25, { damping: 6, stiffness: 220 }), withSpring(1)));
-    name.value = withDelay(1350, withTiming(1, { duration: 450, easing: Easing.out(Easing.quad) }));
-    credit.value = withDelay(1650, withTiming(1, { duration: 450 }));
-    const timer = setTimeout(finish, 2600);
+    glass.value = withSpring(1, { damping: 14, stiffness: 70 });
+    level.value = withDelay(700, withTiming(FULL, { duration: 1800, easing: Easing.inOut(Easing.cubic) }));
+    straw.value = withDelay(2400, withSpring(1, { damping: 12, stiffness: 90 }));
+    leaf.value = withDelay(2900, withSequence(withSpring(1.25, { damping: 6, stiffness: 220 }), withSpring(1)));
+    name.value = withDelay(3300, withTiming(1, { duration: 700, easing: Easing.out(Easing.quad) }));
+    credit.value = withDelay(3900, withTiming(1, { duration: 700 }));
+    const timer = setTimeout(finish, 5200);
     return () => clearTimeout(timer);
     // Once, when it is shown.
     // eslint-disable-next-line react-hooks/exhaustive-deps
