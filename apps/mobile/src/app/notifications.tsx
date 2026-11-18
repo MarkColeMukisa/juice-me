@@ -4,6 +4,8 @@ import { RefreshControl, View } from "react-native";
 
 import { Body, Button, Card, Heading, Loading, Notice, Row, Screen } from "@/components/ui";
 import { api, messageOf } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
+import { useShop } from "@/lib/cart";
 import { spacing } from "@/lib/theme";
 import { useLoaded } from "@/lib/use-loaded";
 import { ago } from "@/lib/when";
@@ -27,6 +29,9 @@ function screenFor(url: string | null): { slug: string; id: string } | null {
 /** Everything the bell holds: what needs attention, and what has happened. */
 export default function Notifications() {
   const inbox = useLoaded(loadInbox);
+  // A customer opens their own order on its Juice Me page, not the general record screen.
+  const { shell } = useAuth();
+  const shop = useShop();
   const [failed, setFailed] = useState<unknown>(null);
 
   if (inbox.loading) return <Loading />;
@@ -73,7 +78,7 @@ export default function Notifications() {
                     icon={item.read ? "ellipse-outline" : "ellipse"}
                     label={item.count > 1 ? `${item.title} (${item.count})` : item.title}
                     detail={[item.body, ago(item.at)].filter(Boolean).join(" · ")}
-                    onPress={target ? () => router.push({ pathname: "/r/[slug]/[id]", params: target }) : undefined}
+                    onPress={target ? () => (shell === "customer" && shop && target.slug === shop.orders.slug ? router.push({ pathname: "/order/[id]", params: { id: target.id } }) : router.push({ pathname: "/r/[slug]/[id]", params: target })) : undefined}
                     last={index === all.length - 1}
                   />
                 );

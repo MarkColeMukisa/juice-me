@@ -22,7 +22,7 @@ class OrderRequest extends ResourceRequest
             : Gate::allows('create', Order::class);
     }
 
-    // nevela:generated:start hash=3086f80ede9a
+    // nevela:generated:start hash=9a9ed202a134
     public function rules(): array
     {
         $order = $this->route('order');
@@ -31,7 +31,7 @@ class OrderRequest extends ResourceRequest
             'number' => ['nullable', 'string', 'max:255', Rule::unique('orders', 'number')->ignore($order)],
             'customer' => ['required', 'string', 'max:255'],
             'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:32', new \Nevela\Laravel\Rules\Phone],
+            'phone' => ['nullable', 'string', 'max:32', new \Nevela\Laravel\Rules\Phone('UG')],
             'delivery' => ['sometimes', 'required', Rule::in(['collection', 'delivery'])],
             'details' => ['nullable', 'string', 'max:65535'],
             'status' => ['sometimes', 'required', Rule::in(['pending', 'accepted', 'preparing', 'ready', 'completed', 'cancelled'])],
@@ -47,7 +47,7 @@ class OrderRequest extends ResourceRequest
     /** Phone fields, and the country each is held to, if any. A number is put in the form it is kept in, +256772123456, before it is checked. */
     protected function phones(): array
     {
-        return ['phone' => NULL];
+        return ['phone' => 'UG'];
     }
 
     /** Fields kept in one form, by their format: an email in small letters, a colour as #aabbcc, a domain without its https://. Put in it before they are checked. */
@@ -60,6 +60,12 @@ class OrderRequest extends ResourceRequest
     protected function defaults(): array
     {
         return ['delivery' => 'collection', 'status' => 'pending'];
+    }
+
+    /** Fields that apply for some values of another only. Elsewhere they are emptied; where they apply, a required one is needed. */
+    protected function conditions(): array
+    {
+        return ['details' => ['on' => 'delivery', 'values' => ['delivery'], 'required' => true, 'message' => 'Needed when the how you get it is Deliver it to me on campus.']];
     }
 
     /** Its lines, sent as "items": order items, checked by their own rules and saved with it. */

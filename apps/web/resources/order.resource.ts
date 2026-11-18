@@ -5,7 +5,7 @@
 import { defineResource, field } from "@flaredev/core";
 
 export default defineResource({
-  // nevela:generated:start hash=a049a56fba74
+  // nevela:generated:start hash=e07a13bb5df6
   name: "Order",
   table: "orders",
   slug: "orders",
@@ -14,11 +14,11 @@ export default defineResource({
   icon: "shopping-bag",
   fields: {
     number: field.string({ required: false, unique: true, placeholder: "Left empty: the next JM- number", ...({ auto: "JM" } as {}) }),
-    customer: field.string(),
+    customer: field.string({ label: "Your name" }),
     email: field.email({ required: false }),
-    phone: field.tel({ required: false }),
-    delivery: field.enum(["collection","delivery"], { default: "collection" }),
-    details: field.text({ required: false, list: true, ...({ column: "hidden" } as {}) }),
+    phone: field.tel({ required: false, label: "Phone number", ...({ country: "UG" } as {}) }),
+    delivery: field.enum(["collection","delivery"], { label: "How you get it", optionLabels: {"collection":"I'll collect it at the bar","delivery":"Deliver it to me on campus"}, default: "collection" }),
+    details: field.text({ required: false, label: "Where to deliver", list: true, ...({ when: {"field":"delivery","values":["delivery"],"required":true} } as {}), ...({ column: "hidden" } as {}) }),
     status: field.enum(["pending","accepted","preparing","ready","completed","cancelled"], { default: "pending" }),
     total: field.float({ required: false, format: "money", currency: "UGX" }),
     orderItems: field.hasMany("OrderItem", { foreignKey: "orderId" }),

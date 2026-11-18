@@ -15,7 +15,8 @@
             "unique": true
         },
         "customer": {
-            "kind": "string"
+            "kind": "string",
+            "label": "Your name"
         },
         "email": {
             "kind": "string",
@@ -24,7 +25,9 @@
         "phone": {
             "kind": "string",
             "format": "tel",
-            "required": false
+            "required": false,
+            "label": "Phone number",
+            "country": "UG"
         },
         "delivery": {
             "kind": "enum",
@@ -32,11 +35,21 @@
                 "collection",
                 "delivery"
             ],
-            "default": "collection"
+            "default": "collection",
+            "label": "How you get it",
+            "optionLabels": {
+                "collection": "I'll collect it at the bar",
+                "delivery": "Deliver it to me on campus"
+            }
         },
         "details": {
             "kind": "text",
-            "required": false
+            "label": "Where to deliver",
+            "when": {
+                "delivery": [
+                    "delivery"
+                ]
+            }
         },
         "status": {
             "kind": "enum",

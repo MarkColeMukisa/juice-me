@@ -30,7 +30,7 @@ export default function Placed() {
         {total && totalField ? <Text style={{ color: colors.muted, fontSize: text.body }}>{display(totalField, Number(total))}</Text> : null}
         <Body muted>We have your order. You can follow it as it is accepted and made ready.</Body>
       </View>
-      {shop && id && canTrack ? <Button label="Track this order" icon="receipt-outline" onPress={() => router.replace({ pathname: "/r/[slug]/[id]", params: { slug: shop.orders.slug, id } })} /> : null}
+      {shop && id && canTrack ? <Button label="Track this order" icon="receipt-outline" onPress={() => router.replace({ pathname: "/order/[id]", params: { id } })} /> : null}
       <Button variant="secondary" label="Keep shopping" onPress={() => router.replace("/")} />
     </Screen>
   );

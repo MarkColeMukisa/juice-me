@@ -99,6 +99,7 @@ function Screens() {
           <Stack.Screen name="access/roles/[id]" options={{ title: "" }} />
           <Stack.Screen name="shop/checkout" options={{ title: "Checkout" }} />
           <Stack.Screen name="shop/placed" options={{ headerShown: false }} />
+          <Stack.Screen name="order/[id]" options={{ title: "" }} />
           {/* One set of screens for every resource. Each sets its own title once it knows which. */}
           <Stack.Screen name="r/[slug]/index" options={{ title: "" }} />
           <Stack.Screen name="r/[slug]/new" options={{ title: "" }} />

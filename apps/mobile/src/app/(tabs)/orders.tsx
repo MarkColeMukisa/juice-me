@@ -63,7 +63,7 @@ export default function Orders() {
               <Pressable
                 key={order.id}
                 accessibilityRole="button"
-                onPress={() => router.push({ pathname: "/r/[slug]/[id]", params: { slug: shop.orders.slug, id: order.id } })}
+                onPress={() => router.push({ pathname: "/order/[id]", params: { id: order.id } })}
                 style={({ pressed }) => [styles.row, index < rows.length - 1 && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border }, pressed && { opacity: 0.6 }]}>
                 <View style={{ flex: 1, gap: 2 }}>
                   <Text style={{ color: colors.text, fontSize: text.body, fontWeight: "600" }}>{String(order[title] ?? "Order")}</Text>

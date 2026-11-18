@@ -1,5 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
 import { Control, fromControl, toControl } from "@/components/record-form";
@@ -50,6 +51,37 @@ function CheckoutForm({ shop }: { shop: Shop }) {
   const [lineIssues, setLineIssues] = useState<Record<number, string[]>>({});
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
+
+  // Juice Me: the phone number and delivery spot of their last order, so a regular doesn't
+  // type them every time. Only into what is still empty, and only what this checkout asks.
+  useEffect(() => {
+    let live = true;
+    (async () => {
+      try {
+        const { data } = await api.get<{ data: ResourceRecord[] }>(`/${shop.orders.slug}`, { perPage: 5, sort: "-createdAt" });
+        if (!live || data.length === 0) return;
+        // Each from the newest order that has it: the last one may have been collected, with no address.
+        const latest = (name: string) => data.map((order) => order[name]).find((value) => value !== null && value !== undefined && value !== "");
+        setValues((current) => {
+          const next = { ...current };
+          for (const [name, field] of fields) {
+            const was = name === "delivery" ? data[0][name] : latest(name);
+            if (!["phone", "details", "delivery"].includes(name) || was === null || was === undefined || was === "") continue;
+            const now = current[name];
+            if (name === "delivery" || now === "" || now === null || now === undefined) next[name] = toControl(field, was);
+          }
+          return next;
+        });
+      } catch {
+        // No earlier order to go by: the form starts empty.
+      }
+    })();
+    return () => {
+      live = false;
+    };
+    // Once, when the checkout opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // The request ran out of time: the order may have been placed. Nothing is sent again from here.
   const [unsure, setUnsure] = useState(false);
 
@@ -158,6 +190,10 @@ function CheckoutForm({ shop }: { shop: Shop }) {
             </View>
           ) : null}
 
+          <View style={{ flexDirection: "row", gap: spacing.sm, alignItems: "center" }}>
+            <Ionicons name="cash-outline" size={20} color={colors.muted} />
+            <Body muted small>Nothing to pay now: you pay when you collect it, or when it's delivered.</Body>
+          </View>
           <Button label="Place order" icon="checkmark" busy={busy} onPress={place} />
           <Button variant="link" label="Back to my cart" disabled={busy} onPress={() => router.back()} />
         </>
