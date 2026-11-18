@@ -57,10 +57,11 @@ export default function TabsLayout() {
       }}>
       <Tabs.Screen name="index" options={{ title: buying || guest ? "Shop" : "Home", tabBarIcon: icon(buying || guest ? "storefront-outline" : "grid-outline", buying || guest ? "storefront" : "grid") }} />
       <Tabs.Screen name="records" options={{ title: "Records", href: shell === "customer" || guest ? null : undefined, tabBarIcon: icon("albums-outline", "albums") }} />
+      <Tabs.Screen name="likes" options={{ title: "Likes", href: buying ? undefined : null, tabBarIcon: icon("heart-outline", "heart") }} />
       <Tabs.Screen name="cart" options={{ title: "Cart", href: buying ? undefined : null, tabBarBadge: cart.count > 0 ? cart.count : undefined, tabBarIcon: icon("cart-outline", "cart") }} />
       <Tabs.Screen name="orders" options={{ title: "Orders", href: buying && tracking ? undefined : null, tabBarIcon: icon("receipt-outline", "receipt") }} />
       <Tabs.Screen name="account" options={{ title: "Account", tabBarIcon: icon("person-outline", "person") }} />
-      <Tabs.Screen name="settings" options={{ title: "Settings", href: guest ? null : undefined, tabBarIcon: icon("settings-outline", "settings") }} />
+      <Tabs.Screen name="settings" options={{ title: "Settings", href: guest || buying ? null : undefined, tabBarIcon: icon("settings-outline", "settings") }} />
     </Tabs>
   );
 }

@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 
+import { Heart } from "@/components/heart";
 import { HomeHeader } from "@/components/home-header";
 import { Picture } from "@/components/pictures";
 import { Body, Button, Notice, Screen } from "@/components/ui";
@@ -207,6 +208,7 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
                   </Pressable>
                   {/* Beside the card's button, not in it: a button can't hold another. */}
                   {addButton(item, 32)}
+                  <Heart id={item.id} title={titleOf(shop, item)} size={30} style={styles.heart} />
                 </View>
               );
             })}
@@ -248,6 +250,7 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
                   </View>
                 </Pressable>
                 {addButton(item)}
+                <Heart id={item.id} title={titleOf(shop, item)} size={34} style={styles.heart} />
               </View>
             );
           })}
@@ -344,5 +347,6 @@ const styles = StyleSheet.create({
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: spacing.md },
   card: { width: "48%", borderWidth: 1, borderRadius: radius.lg, overflow: "hidden" },
   cardText: { padding: spacing.md, gap: 2 },
+  heart: { position: "absolute", left: spacing.sm, top: spacing.sm },
   add: { position: "absolute", right: spacing.sm, top: spacing.sm, minWidth: 32, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
 });

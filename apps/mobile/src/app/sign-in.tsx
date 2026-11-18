@@ -84,7 +84,7 @@ export default function SignIn() {
       <View style={{ gap: spacing.xs }}>
         <Logo />
         <Title>{site.name}</Title>
-        <Body muted>{way === "password" ? (params.reason === "cart" ? "Sign in to add it to your cart. You'll come back to it." : "Sign in to continue.") : codeSent ? `Enter the code we sent to ${address}.` : "We'll email you a code to sign in with."}</Body>
+        <Body muted>{way === "password" ? (params.reason === "cart" ? "Sign in to add it to your cart. You'll come back to it." : params.reason === "like" ? "Sign in to keep the drinks you like. You'll come back to it." : "Sign in to continue.") : codeSent ? `Enter the code we sent to ${address}.` : "We'll email you a code to sign in with."}</Body>
       </View>
 
       {error && !(error instanceof ApiError && error.issues.length > 0) ? <Notice>{messageOf(error)}</Notice> : null}

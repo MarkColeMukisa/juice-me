@@ -13,7 +13,7 @@ import { Image } from "expo-image";
 
 /** Your account: who you are here, your name, and how you sign in. */
 export default function Account() {
-  const { user, reload } = useAuth();
+  const { user, reload, shell } = useAuth();
   const colors = useColors();
   const [name, setName] = useState(user?.name ?? "");
   const [busy, setBusy] = useState(false);
@@ -114,6 +114,12 @@ export default function Account() {
             {mayDelete ? <Row icon="trash-outline" label="Trash" detail="Bring back what was deleted" onPress={() => router.push("/trash")} last /> : null}
           </Card>
         </View>
+      ) : null}
+
+      {shell === "customer" ? (
+        <Card>
+          <Row icon="settings-outline" label="Settings" detail="Appearance, devices and the server" onPress={() => router.push("/settings")} last />
+        </Card>
       ) : null}
 
       <View style={{ gap: spacing.sm }}>

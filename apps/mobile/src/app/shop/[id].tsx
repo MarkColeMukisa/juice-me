@@ -2,6 +2,7 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { Heart } from "@/components/heart";
 import { Picture } from "@/components/pictures";
 import { Stepper } from "@/components/stepper";
 import { Body, Button, Card, Loading, Notice, Row, Screen } from "@/components/ui";
@@ -84,7 +85,7 @@ export default function ProductScreen() {
 
   return (
     <Screen edges={["bottom"]}>
-      <Stack.Screen options={{ title: titleOf(shop, record) }} />
+      <Stack.Screen options={{ title: titleOf(shop, record), headerRight: () => <Heart id={record.id} title={titleOf(shop, record)} /> }} />
 
       <Picture file={pictures[shown] ?? null} size="fill" rendition="card" />
       {pictures.length > 1 ? (
