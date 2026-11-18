@@ -1,3 +1,4 @@
+import { File } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
@@ -98,9 +99,17 @@ export async function pickImages(from: "library" | "camera", { many = false, squ
   return chosen.canceled ? [] : Promise.all(chosen.assets.map(prepared));
 }
 
-/** The bytes of a picture on the phone, as the request sends them. */
-async function bytesOf(picked: Picked): Promise<Blob> {
-  return (await fetch(picked.uri)).blob();
+/**
+ * The bytes of a picture on the phone, as the request sends them.
+ *
+ * On a phone they are read from the file itself. Reading it back with fetch("file://…") and
+ * sending that Blob did not send the picture on Android (Expo's fetch, which replaces React
+ * Native's): Laravel received something that wasn't an image and refused every photo, as
+ * "doesn't contain image data". A browser's picture is a blob: URL, which fetch reads fine.
+ */
+async function bytesOf(picked: Picked): Promise<ArrayBuffer | Blob> {
+  if (Platform.OS === "web") return (await fetch(picked.uri)).blob();
+  return new File(picked.uri).arrayBuffer();
 }
 
 /** Send a picture to a resource's file field. Save the answer's `key` in the record. */

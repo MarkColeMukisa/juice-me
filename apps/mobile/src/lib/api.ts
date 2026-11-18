@@ -177,7 +177,7 @@ interface Options {
   /** Sent as JSON. */
   body?: unknown;
   /** A file, sent as it is: the body of the request is the file, and `type` what it is. */
-  file?: { body: Blob; type: string };
+  file?: { body: Blob | ArrayBuffer; type: string };
   /** Longer than the usual wait, for a photo going up over a phone's connection. */
   timeout?: number;
   query?: Record<string, string | number | boolean | null | undefined>;
@@ -235,7 +235,7 @@ export const api = {
   put: <T>(path: string, body: unknown) => request<T>(path, { method: "PUT", body }),
   delete: <T = null>(path: string) => request<T>(path, { method: "DELETE" }),
   /** PUT a file: the request's body is the file itself, which is how Laravel takes an upload. */
-  upload: <T>(path: string, file: { body: Blob; type: string }, query?: Options["query"]) => request<T>(path, { method: "PUT", file, query, timeout: UPLOAD_TIMEOUT_MS }),
+  upload: <T>(path: string, file: { body: Blob | ArrayBuffer; type: string }, query?: Options["query"]) => request<T>(path, { method: "PUT", file, query, timeout: UPLOAD_TIMEOUT_MS }),
 
   async hasToken(): Promise<boolean> {
     const held = await tokens();
