@@ -18,5 +18,14 @@
             ],
             "required": false
         }
+    },
+    "public": {
+        "read": {
+            "fields": [
+                "name",
+                "image"
+            ],
+            "throttle": "600,1"
+        }
     }
 }

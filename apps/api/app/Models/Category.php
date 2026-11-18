@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -36,4 +37,10 @@ class Category extends Model
     // nevela:generated:end
 
     // Your own relationships, scopes and accessors go here — outside the generated block.
+
+    // Every kind of drink is shown to anyone, to narrow the menu by.
+    public function scopePublicQuery(Builder $query): void
+    {
+        // All of them.
+    }
 }

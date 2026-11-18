@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Banner extends Model
@@ -32,4 +33,10 @@ class Banner extends Model
     // nevela:generated:end
 
     // Your own relationships, scopes and accessors go here — outside the generated block.
+
+    // The home page's banners, as anyone sees them: only those switched on.
+    public function scopePublicQuery(Builder $query): void
+    {
+        $query->where('active', true);
+    }
 }

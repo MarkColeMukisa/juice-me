@@ -8,10 +8,12 @@ import { HomeHeader } from "@/components/home-header";
 import { Picture } from "@/components/pictures";
 import { Body, Button, Notice, Screen } from "@/components/ui";
 import { api, messageOf } from "@/lib/api";
-import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
+import { useAddToCart, useCart } from "@/lib/cart";
 import { display, type StoredFile } from "@/lib/format";
+import { readPath, recordKey } from "@/lib/guest";
 import { useResources, type ResourceRecord } from "@/lib/resources";
-import type { Shop } from "@/lib/shop";
+import type { Catalogue } from "@/lib/shop";
 import { cartItemOf, pictureOf, priceOf, titleOf } from "@/lib/shop-item";
 import { radius, spacing, text, useColors } from "@/lib/theme";
 import { useLoaded } from "@/lib/use-loaded";
@@ -34,11 +36,14 @@ const pictureOfRecord = (record: ResourceRecord, field = "image") => (record[`${
  * and every drink, to search and add to the cart. The banners and specials are the bar's to
  * change, in the dashboard: Banners, and "Featured" on a drink.
  */
-export function JuiceHome({ shop }: { shop: Shop }) {
+export function JuiceHome({ shop }: { shop: Catalogue }) {
   const colors = useColors();
   const cart = useCart();
+  const add = useAddToCart();
+  const { user } = useAuth();
   const { byName } = useResources();
-  const inbox = useLoaded(loadInbox);
+  // Someone browsing before signing in has no bell to ask about.
+  const inbox = useLoaded(useCallback(() => (user ? loadInbox() : Promise.resolve(null)), [user]));
   const { width } = useWindowDimensions();
 
   const [search, setSearch] = useState("");
@@ -61,16 +66,16 @@ export function JuiceHome({ shop }: { shop: Shop }) {
   const bannerResource = byName("Banner");
 
   const categories = useLoaded(
-    useCallback(async () => (categoryResource ? (await api.get<{ data: ResourceRecord[] }>(`/${categoryResource.slug}`, { perPage: 30, sort: "name" })).data : []), [categoryResource]),
+    useCallback(async () => (categoryResource ? (await api.get<{ data: ResourceRecord[] }>(readPath(categoryResource), { perPage: 30, sort: "name" }, { auth: !categoryResource.open })).data : []), [categoryResource]),
   );
   const banners = useLoaded(
-    useCallback(async () => (bannerResource ? (await api.get<{ data: ResourceRecord[] }>(`/${bannerResource.slug}`, { perPage: 10, sort: "position", "filter[active]": true })).data : []), [bannerResource]),
+    useCallback(async () => (bannerResource ? (await api.get<{ data: ResourceRecord[] }>(readPath(bannerResource), { perPage: 10, sort: "position", "filter[active]": true }, { auth: !bannerResource.open })).data : []), [bannerResource]),
   );
   const specials = useLoaded(
     useCallback(async () => {
       const asked: Record<string, string | number | boolean> = { perPage: 10, "filter[featured]": true };
       if (shop.available) asked[`filter[${shop.available}]`] = true;
-      return (await api.get<Page>(`/${shop.catalogue.slug}`, asked)).data;
+      return (await api.get<Page>(readPath(shop.catalogue), asked, { auth: !shop.catalogue.open })).data;
     }, [shop]),
   );
 
@@ -81,7 +86,7 @@ export function JuiceHome({ shop }: { shop: Shop }) {
         const asked: Record<string, string | number | boolean> = { page: wanted, perPage: PER_PAGE, q: words.trim(), sort: "name" };
         if (shop.category && chosen) asked[`filter[${shop.category}]`] = chosen;
         if (shop.available) asked[`filter[${shop.available}]`] = true;
-        const answer = await api.get<Page>(`/${shop.catalogue.slug}`, asked);
+        const answer = await api.get<Page>(readPath(shop.catalogue), asked, { auth: !shop.catalogue.open });
         if (mine !== latest.current) return;
         setItems((current) => (wanted === 1 ? answer.data : [...current, ...answer.data.filter((record) => !current.some((had) => had.id === record.id))]));
         setPage(answer.meta.page);
@@ -130,7 +135,7 @@ export function JuiceHome({ shop }: { shop: Shop }) {
         accessibilityRole="button"
         accessibilityLabel={`Add ${titleOf(shop, item)} to the cart`}
         hitSlop={6}
-        onPress={() => cart.add(cartItemOf(shop, item))}
+        onPress={() => add(cartItemOf(shop, item))}
         style={[styles.add, { width: size, height: size, borderRadius: size / 2, backgroundColor: colors.brand }]}>
         {count > 0 ? <Text style={{ color: colors.onBrand, fontWeight: "700", fontSize: text.small }}>{count}</Text> : <Ionicons name="add" size={20} color={colors.onBrand} />}
       </Pressable>
@@ -193,7 +198,7 @@ export function JuiceHome({ shop }: { shop: Shop }) {
               const price = priceOf(shop, item);
               return (
                 <View key={item.id} style={[styles.special, { backgroundColor: colors.background }]}>
-                  <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/shop/[id]", params: { id: item.id } })}>
+                  <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/shop/[id]", params: { id: recordKey(shop.catalogue, item) } })}>
                     <Picture file={pictureOf(shop, item)} size="fill" rendition="card" />
                     <View style={{ padding: spacing.sm, gap: 2 }}>
                       <Text numberOfLines={1} style={{ color: colors.text, fontWeight: "700", fontSize: text.small }}>{titleOf(shop, item)}</Text>
@@ -234,7 +239,7 @@ export function JuiceHome({ shop }: { shop: Shop }) {
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={`${titleOf(shop, item)}${price !== null && priceField ? `, ${display(priceField, price)}` : ""}`}
-                  onPress={() => router.push({ pathname: "/shop/[id]", params: { id: item.id } })}
+                  onPress={() => router.push({ pathname: "/shop/[id]", params: { id: recordKey(shop.catalogue, item) } })}
                   style={({ pressed }) => pressed && { opacity: 0.7 }}>
                   <Picture file={pictureOf(shop, item)} size="fill" rendition="card" />
                   <View style={styles.cardText}>

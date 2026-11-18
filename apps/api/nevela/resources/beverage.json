@@ -47,5 +47,20 @@
             "kind": "boolean",
             "default": false
         }
+    },
+    "public": {
+        "read": {
+            "fields": [
+                "name",
+                "description",
+                "price",
+                "size",
+                "image",
+                "categoryId",
+                "available",
+                "featured"
+            ],
+            "throttle": "600,1"
+        }
     }
 }

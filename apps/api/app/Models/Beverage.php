@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Beverage extends Model
@@ -40,4 +41,10 @@ class Beverage extends Model
     // nevela:generated:end
 
     // Your own relationships, scopes and accessors go here — outside the generated block.
+
+    // Anyone may browse the menu before signing in: only what the bar can make now.
+    public function scopePublicQuery(Builder $query): void
+    {
+        $query->where('available', true);
+    }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b780fb7c1be8db9a5be426126747e779",
+    "content-hash": "b95a91630350a9a26a5d1e9ffa207c46",
     "packages": [
         {
             "name": "brick/math",
@@ -2855,16 +2855,16 @@
         },
         {
             "name": "nevela/laravel",
-            "version": "v0.32.0",
+            "version": "v0.33.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/MarkColeMukisa/nevela-laravel.git",
-                "reference": "162d1c186a5f8b203a14099c58e7e8f74987d816"
+                "reference": "a15ded74c23b34e685ec0f0cd9b2e3eae24b3f9d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/MarkColeMukisa/nevela-laravel/zipball/162d1c186a5f8b203a14099c58e7e8f74987d816",
-                "reference": "162d1c186a5f8b203a14099c58e7e8f74987d816",
+                "url": "https://api.github.com/repos/MarkColeMukisa/nevela-laravel/zipball/a15ded74c23b34e685ec0f0cd9b2e3eae24b3f9d",
+                "reference": "a15ded74c23b34e685ec0f0cd9b2e3eae24b3f9d",
                 "shasum": ""
             },
             "require": {
@@ -2925,8 +2925,8 @@
                 "issues": "https://github.com/MarkColeMukisa/nevela/issues",
                 "source": "https://github.com/MarkColeMukisa/nevela"
             },
-            "time": "2026-11-17T22:23:12+00:00",
-            "published-time": "2026-11-17T22:37:23+00:00"
+            "time": "2026-11-18T03:47:42+00:00",
+            "published-time": "2026-11-18T04:22:19+00:00"
         },
         {
             "name": "nikic/php-parser",

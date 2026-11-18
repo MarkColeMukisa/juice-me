@@ -34,5 +34,18 @@
             "kind": "int",
             "default": 0
         }
+    },
+    "public": {
+        "read": {
+            "fields": [
+                "title",
+                "subtitle",
+                "image",
+                "categoryId",
+                "active",
+                "position"
+            ],
+            "throttle": "600,1"
+        }
     }
 }

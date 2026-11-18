@@ -13,7 +13,7 @@
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
         "laravel/sanctum": "^4.0",
-        "nevela/laravel": "^0.32"
+        "nevela/laravel": "^0.33"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
