@@ -10,7 +10,15 @@ import { loadAppearance, setAppearance, spacing, type AppearanceChoice } from "@
 
 /** Settings: the devices you are signed in on, what this app is talking to, and signing out. */
 export default function Settings() {
-  const { signOut } = useAuth();
+  return <SettingsScreen />;
+}
+
+/**
+ * The settings themselves: a tab for staff, and for a customer a page opened from Account
+ * (app/preferences.tsx), with a way back. A customer isn't shown which server the app uses.
+ */
+export function SettingsScreen({ inTabs = true }: { inTabs?: boolean }) {
+  const { signOut, shell } = useAuth();
   const [leaving, setLeaving] = useState(false);
   const [appearance, setChosen] = useState<AppearanceChoice>("system");
 
@@ -24,8 +32,8 @@ export default function Settings() {
   };
 
   return (
-    <Screen inTabs>
-      <Title>Settings</Title>
+    <Screen inTabs={inTabs} edges={inTabs ? undefined : ["bottom"]}>
+      {inTabs ? <Title>Settings</Title> : null}
 
       <View style={{ gap: spacing.sm }}>
         <Heading>Security</Heading>
@@ -49,7 +57,7 @@ export default function Settings() {
       <View style={{ gap: spacing.sm }}>
         <Heading>About</Heading>
         <Card>
-          <Row icon="server-outline" label="Server" detail={API_URL} />
+          {shell !== "customer" ? <Row icon="server-outline" label="Server" detail={API_URL} /> : null}
           <Row icon="information-circle-outline" label="Version" value={Constants.expoConfig?.version ?? "1.0.0"} last />
         </Card>
       </View>

@@ -13,7 +13,8 @@ import { Image } from "expo-image";
 
 /** Your account: who you are here, your name, and how you sign in. */
 export default function Account() {
-  const { user, reload, shell } = useAuth();
+  const { user, reload, shell, signOut } = useAuth();
+  const [leaving, setLeaving] = useState(false);
   const colors = useColors();
   const [name, setName] = useState(user?.name ?? "");
   const [busy, setBusy] = useState(false);
@@ -118,7 +119,7 @@ export default function Account() {
 
       {shell === "customer" ? (
         <Card>
-          <Row icon="settings-outline" label="Settings" detail="Appearance, devices and the server" onPress={() => router.push("/settings")} last />
+          <Row icon="settings-outline" label="Settings" detail="Appearance, devices and two-step sign-in" onPress={() => router.push("/preferences")} last />
         </Card>
       ) : null}
 
@@ -129,6 +130,9 @@ export default function Account() {
           <Row icon="key-outline" label="Two-step sign-in" detail={user.twoFactorEnabled ? "Two-step sign-in is on" : "Two-step sign-in is off"} onPress={() => router.push("/security")} last />
         </Card>
       </View>
+
+      {/* A customer has no Settings tab: signing out is here, where they look for it. */}
+      {shell === "customer" ? <Button variant="danger" label="Sign out" icon="log-out-outline" busy={leaving} onPress={async () => { setLeaving(true); try { await signOut(); } finally { setLeaving(false); } }} /> : null}
     </Screen>
   );
 }
