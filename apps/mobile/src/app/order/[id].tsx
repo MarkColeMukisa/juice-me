@@ -8,6 +8,7 @@ import { RecordActions } from "@/components/record-actions";
 import type { Step } from "@/components/record-history";
 import { Body, Button, Card, Heading, Loading, Notice, Row, Screen } from "@/components/ui";
 import { api, ApiError, messageOf } from "@/lib/api";
+import { useAlerts } from "@/lib/alerts";
 import { useAuth } from "@/lib/auth";
 import { useCart, useShop } from "@/lib/cart";
 import { display } from "@/lib/format";
@@ -64,6 +65,20 @@ function Order({ shop, id }: { shop: Shop; id: string }) {
   const data = order.data;
   const status = String(data?.status ?? "");
   const { reload } = order;
+
+  // News about this order (from the bell) is seen here: shown, then marked read. One that
+  // arrives while the page is open moves it on at once, without waiting for its own turn.
+  const alerts = useAlerts();
+  const news = alerts.unreadAbout(shop.orders.slug, id).map((item) => item.id).join(",");
+  const { markRead } = alerts;
+  useEffect(() => {
+    if (!news || !data) return;
+    void markRead(news.split(","));
+    void reload();
+    void loadSteps();
+    // The ids say when there is news; the order being there is what lets it be read.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [news, data !== null && data !== undefined]);
 
   // While it is still moving, it is looked at again every few seconds: the bar accepts it,
   // makes it, and the customer sees each step without pulling down.

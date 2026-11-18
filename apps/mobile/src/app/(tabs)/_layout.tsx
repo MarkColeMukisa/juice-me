@@ -5,6 +5,7 @@ import { useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TAB_BAR_HEIGHT } from "@/components/ui";
+import { useAlerts } from "@/lib/alerts";
 import { useAuth } from "@/lib/auth";
 import { useCanTrack, useCart, useCatalogue, useShop } from "@/lib/cart";
 import { useColors } from "@/lib/theme";
@@ -26,6 +27,8 @@ export default function TabsLayout() {
   const guest = user === null && catalogue !== null;
   const tracking = useCanTrack(shop);
   const cart = useCart();
+  // News about their orders not yet seen: a badge on Orders.
+  const orderNews = useAlerts().unreadAbout("orders").length;
   const icon = (name: IconName, active: IconName) => ({ focused, size }: { focused: boolean; size: number }) => <Ionicons name={focused ? active : name} color={focused ? colors.accent : colors.muted} size={size} />;
 
   return (
@@ -59,7 +62,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="records" options={{ title: "Records", href: shell === "customer" || guest ? null : undefined, tabBarIcon: icon("albums-outline", "albums") }} />
       <Tabs.Screen name="likes" options={{ title: "Likes", href: buying ? undefined : null, tabBarIcon: icon("heart-outline", "heart") }} />
       <Tabs.Screen name="cart" options={{ title: "Cart", href: buying ? undefined : null, tabBarBadge: cart.count > 0 ? cart.count : undefined, tabBarIcon: icon("cart-outline", "cart") }} />
-      <Tabs.Screen name="orders" options={{ title: "Orders", href: buying && tracking ? undefined : null, tabBarIcon: icon("receipt-outline", "receipt") }} />
+      <Tabs.Screen name="orders" options={{ title: "Orders", href: buying && tracking ? undefined : null, tabBarBadge: buying && orderNews > 0 ? orderNews : undefined, tabBarIcon: icon("receipt-outline", "receipt") }} />
       <Tabs.Screen name="account" options={{ title: "Account", tabBarIcon: icon("person-outline", "person") }} />
       <Tabs.Screen name="settings" options={{ title: "Settings", href: guest || buying ? null : undefined, tabBarIcon: icon("settings-outline", "settings") }} />
     </Tabs>

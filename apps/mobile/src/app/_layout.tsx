@@ -7,6 +7,7 @@ import { useColorScheme } from "react-native";
 
 import { Intro } from "@/components/intro";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { AlertsProvider } from "@/lib/alerts";
 import { CartProvider, useCatalogue } from "@/lib/cart";
 import { forgetComeBack, takeComeBack } from "@/lib/guest";
 import { ResourcesProvider, useResources } from "@/lib/resources";
@@ -29,7 +30,9 @@ export default function RootLayout() {
     <AuthProvider>
       <ResourcesProvider>
         <CartProvider>
-          <Screens />
+          <AlertsProvider>
+            <Screens />
+          </AlertsProvider>
         </CartProvider>
       </ResourcesProvider>
     </AuthProvider>

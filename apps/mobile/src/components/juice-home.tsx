@@ -9,6 +9,7 @@ import { HomeHeader } from "@/components/home-header";
 import { Picture } from "@/components/pictures";
 import { Body, Button, Notice, Screen } from "@/components/ui";
 import { api, messageOf } from "@/lib/api";
+import { useAlerts } from "@/lib/alerts";
 import { useAuth } from "@/lib/auth";
 import { useAddToCart, useCart } from "@/lib/cart";
 import { display, type StoredFile } from "@/lib/format";
@@ -18,7 +19,6 @@ import type { Catalogue } from "@/lib/shop";
 import { cartItemOf, pictureOf, priceOf, titleOf } from "@/lib/shop-item";
 import { radius, spacing, text, useColors } from "@/lib/theme";
 import { useLoaded } from "@/lib/use-loaded";
-import { loadInbox } from "@/app/notifications";
 
 const PER_PAGE = 20;
 /** How long each banner stays before the next slides in. */
@@ -43,8 +43,8 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
   const add = useAddToCart();
   const { user } = useAuth();
   const { byName } = useResources();
-  // Someone browsing before signing in has no bell to ask about.
-  const inbox = useLoaded(useCallback(() => (user ? loadInbox() : Promise.resolve(null)), [user]));
+  // The bell, kept current while the app is open (lib/alerts). A guest has none.
+  const alerts = useAlerts();
   const { width } = useWindowDimensions();
 
   const [search, setSearch] = useState("");
@@ -114,7 +114,7 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
 
   const refresh = async () => {
     setRefreshing(true);
-    await Promise.all([load(1, query, category), inbox.refresh(), categories.refresh(), banners.refresh(), specials.refresh()]);
+    await Promise.all([load(1, query, category), alerts.refresh(), categories.refresh(), banners.refresh(), specials.refresh()]);
     setRefreshing(false);
   };
 
@@ -145,7 +145,7 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
 
   return (
     <Screen inTabs scrollRef={scroller} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
-      <HomeHeader unread={inbox.data?.unread ?? 0} />
+      <HomeHeader unread={alerts.unread} />
 
       <View style={[styles.search, { borderColor: colors.border, backgroundColor: colors.surface }]}>
         <Ionicons name="search-outline" size={18} color={colors.muted} />

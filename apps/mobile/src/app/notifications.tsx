@@ -1,9 +1,10 @@
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import { RefreshControl, View } from "react-native";
 
 import { Body, Button, Card, Heading, Loading, Notice, Row, Screen } from "@/components/ui";
 import { api, messageOf } from "@/lib/api";
+import { useAlerts } from "@/lib/alerts";
 import { useAuth } from "@/lib/auth";
 import { useShop } from "@/lib/cart";
 import { spacing } from "@/lib/theme";
@@ -32,6 +33,9 @@ export default function Notifications() {
   // A customer opens their own order on its Juice Me page, not the general record screen.
   const { shell } = useAuth();
   const shop = useShop();
+  // Leaving the bell: the badges elsewhere catch up with what was read here.
+  const { refresh: refreshAlerts } = useAlerts();
+  useFocusEffect(useCallback(() => () => void refreshAlerts(), [refreshAlerts]));
   const [failed, setFailed] = useState<unknown>(null);
 
   if (inbox.loading) return <Loading />;
