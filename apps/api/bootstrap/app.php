@@ -17,6 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Hosted, requests arrive through the platform's proxy: trust what it says about the
         // address and https, so links Laravel makes (photos, emails) are https.
         $middleware->trustProxies(at: '*');
+        // Nevela names this alias only where it adds its routes, which it skips when routes
+        // are cached (php artisan optimize, as a hosted start does): named here as well.
+        $middleware->alias(['nevela.throttle' => \Nevela\Laravel\Http\PublicThrottle::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(
