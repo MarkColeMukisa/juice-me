@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "400641402243",
+    "project_id": "juice-me-256",
+    "storage_bucket": "juice-me-256.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:400641402243:android:ea518bb13bf851151342b6",
+        "android_client_info": {
+          "package_name": "com.juiceme.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5rvFju48G1zK4SndD69Cyy-9dutrOAg8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
