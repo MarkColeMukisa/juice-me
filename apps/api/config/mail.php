@@ -37,6 +37,13 @@ return [
 
     'mailers' => [
 
+        // Brevo's HTTPS API, for hosts that block SMTP ports (Sevalla does). MAIL_MAILER=brevo
+        // and BREVO_API_KEY; the sender (MAIL_FROM_ADDRESS) must be verified in Brevo.
+        'brevo' => [
+            'transport' => 'brevo',
+            'key' => env('BREVO_API_KEY'),
+        ],
+
         'smtp' => [
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
