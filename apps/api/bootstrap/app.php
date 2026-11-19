@@ -14,6 +14,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // A phone sends a picture as a form; Nevela takes the file as the body (see the class).
         $middleware->api(append: [\App\Http\Middleware\UploadsFromForms::class]);
+        // Hosted, requests arrive through the platform's proxy: trust what it says about the
+        // address and https, so links Laravel makes (photos, emails) are https.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

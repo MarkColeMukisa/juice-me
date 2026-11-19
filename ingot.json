@@ -1,0 +1,5 @@
+{
+  // Sevalla builds the Laravel API in apps/api. The dashboard (apps/web) and the mobile app
+  // (apps/mobile) are deployed elsewhere.
+  "app": "apps/api"
+}
