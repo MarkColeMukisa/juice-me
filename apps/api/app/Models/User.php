@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Support\AccountAlerts;
 use Database\Factories\UserFactory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,5 +31,23 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        // An account whose email was just proven (made verified, or verified now): the
+        // administrators hear of their new customer. Not for accounts made at the console.
+        static::saved(function (User $user): void {
+            if (app()->runningInConsole() && ! app()->runningUnitTests()) {
+                return;
+            }
+            if ($user->email_verified_at === null || $user->getOriginal('email_verified_at') !== null) {
+                return;
+            }
+            if (! $user->wasRecentlyCreated && ! $user->wasChanged('email_verified_at')) {
+                return;
+            }
+            DB::afterCommit(fn () => AccountAlerts::verified($user));
+        });
     }
 }

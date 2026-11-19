@@ -75,7 +75,7 @@ final class OrderAlerts
     }
 
     /** The administrators: their ids and emails. */
-    private static function admins(): \Illuminate\Support\Collection
+    public static function admins(): \Illuminate\Support\Collection
     {
         $model = config('auth.providers.users.model');
         $user = new $model;

@@ -26,7 +26,7 @@ export default function SignIn() {
   const auth = useAuth();
   // Sent here from sign-up with an address that already has an account: it is filled in.
   const params = useLocalSearchParams<{ email?: string; reason?: string }>();
-  const [way, setWay] = useState<"password" | "code">("password");
+  const [way, setWay] = useState<"password" | "code" | "verify">("password");
   const [emailCode, setEmailCode] = useState(false);
   const [registration, setRegistration] = useState(false);
   const [social, setSocial] = useState<string[]>([]);
@@ -76,6 +76,24 @@ export default function SignIn() {
     return <SecondStep challenge={challenge} onCancel={() => setChallenge(null)} />;
   }
 
+  /**
+   * A password sign-in for an account whose email isn't proven yet: Laravel has just emailed
+   * a new code, so the code is asked for here, and entering it signs them in.
+   */
+  const withPassword = () =>
+    run(async () => {
+      try {
+        setChallenge(await auth.signIn(address, password));
+      } catch (caught) {
+        if (caught instanceof ApiError && caught.code === "EMAIL_NOT_VERIFIED") {
+          setWay("verify");
+          setCode("");
+          return;
+        }
+        throw caught;
+      }
+    });
+
   const issue = (path: string) => (error instanceof ApiError ? error.issue(path) : undefined);
   const address = email.trim();
 
@@ -84,17 +102,24 @@ export default function SignIn() {
       <View style={{ gap: spacing.xs }}>
         <Logo />
         <Title>{site.name}</Title>
-        <Body muted>{way === "password" ? (params.reason === "cart" ? "Sign in to add it to your cart. You'll come back to it." : params.reason === "like" ? "Sign in to keep the drinks you like. You'll come back to it." : "Sign in to continue.") : codeSent ? `Enter the code we sent to ${address}.` : "We'll email you a code to sign in with."}</Body>
+        <Body muted>{way === "verify" ? `Verify your email first: enter the 6-digit code we just sent to ${address}.` : way === "password" ? (params.reason === "cart" ? "Sign in to add it to your cart. You'll come back to it." : params.reason === "like" ? "Sign in to keep the drinks you like. You'll come back to it." : "Sign in to continue.") : codeSent ? `Enter the code we sent to ${address}.` : "We'll email you a code to sign in with."}</Body>
       </View>
 
       {error && !(error instanceof ApiError && error.issues.length > 0) ? <Notice>{messageOf(error)}</Notice> : null}
 
-      <Field label="Email" value={email} onChangeText={setEmail} error={issue("email")} autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" textContentType="username" editable={!codeSent} returnKeyType="next" />
+      <Field label="Email" value={email} onChangeText={setEmail} error={issue("email")} autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" textContentType="username" editable={!codeSent && way !== "verify"} returnKeyType="next" />
 
-      {way === "password" ? (
+      {way === "verify" ? (
         <>
-          <Field label="Password" value={password} onChangeText={setPassword} error={issue("password")} secureTextEntry autoComplete="current-password" textContentType="password" returnKeyType="go" onSubmitEditing={() => run(async () => setChallenge(await auth.signIn(address, password)))} />
-          <Button label="Sign in" busy={busy} disabled={address === "" || password === "" || provider !== null} onPress={() => run(async () => setChallenge(await auth.signIn(address, password)))} />
+          <Field label="Code" value={code} onChangeText={setCode} error={issue("code")} keyboardType="number-pad" autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus returnKeyType="go" onSubmitEditing={() => run(async () => setChallenge(await auth.verifyEmail(address, code)))} />
+          <Button label="Verify and sign in" busy={busy} disabled={code.trim() === ""} onPress={() => run(async () => setChallenge(await auth.verifyEmail(address, code)))} />
+          <Button variant="link" label="Send a new code" disabled={busy} onPress={() => run(async () => { await auth.resendVerification(address); setCode(""); })} />
+          <Button variant="link" label="Back" disabled={busy} onPress={() => { setWay("password"); setCode(""); setError(null); }} />
+        </>
+      ) : way === "password" ? (
+        <>
+          <Field label="Password" value={password} onChangeText={setPassword} error={issue("password")} secureTextEntry autoComplete="current-password" textContentType="password" returnKeyType="go" onSubmitEditing={withPassword} />
+          <Button label="Sign in" busy={busy} disabled={address === "" || password === "" || provider !== null} onPress={withPassword} />
         </>
       ) : codeSent ? (
         <>
@@ -108,7 +133,7 @@ export default function SignIn() {
 
       <SocialButtons providers={social} busy={provider} disabled={busy} onPick={withProvider} />
 
-      {emailCode ? (
+      {emailCode && way !== "verify" ? (
         <Button variant="link" label={way === "password" ? "Sign in with an emailed code instead" : "Sign in with a password instead"} onPress={() => { setWay(way === "password" ? "code" : "password"); setCodeSent(false); setCode(""); setError(null); }} />
       ) : null}
 
