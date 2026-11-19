@@ -9,8 +9,9 @@ use Nevela\Laravel\Auth\AuthMail;
 use Throwable;
 
 /**
- * Emails to the people who run the shop: every administrator hears when a customer places
- * an order, and when a customer cancels one. (Nevela's bell tells them in the app too.)
+ * Emails and push notifications to the people who run the shop: every administrator hears
+ * when a customer places an order, and when a customer cancels one. (Nevela's bell tells
+ * them in the app too.)
  *
  * Sent after the order is saved for good, and never in the way of it: an email that can't
  * be sent is reported, and the customer's order stands.
@@ -34,7 +35,7 @@ final class OrderAlerts
             $lines[] = 'Note from the customer: '.trim((string) $order->details);
         }
 
-        self::send("New order {$order->number}: ".self::money((float) $order->total), $lines);
+        self::send("New order {$order->number}: ".self::money((float) $order->total), $lines, $order);
     }
 
     public static function cancelled(Order $order): void
@@ -42,19 +43,22 @@ final class OrderAlerts
         self::send("Order {$order->number} was cancelled by the customer", [
             self::who($order),
             'Total was '.self::money((float) $order->total).'. Nothing more needs doing for it.',
-        ]);
+        ], $order);
     }
 
     /** @param list<string> $lines */
-    private static function send(string $subject, array $lines): void
+    private static function send(string $subject, array $lines, Order $order): void
     {
-        foreach (self::admins() as $email) {
+        $admins = self::admins();
+        foreach ($admins->pluck('email')->filter() as $email) {
             try {
                 AuthMail::send($email, $subject, $lines);
             } catch (Throwable $e) {
                 report($e);
             }
         }
+        // On their phones too: the first line (who, and how) under the subject.
+        Push::send($admins->pluck('id'), $subject, $lines[0] ?? null, "/dashboard/orders/{$order->getKey()}");
     }
 
     private static function who(Order $order): string
@@ -70,8 +74,8 @@ final class OrderAlerts
         return config('nevela.currency', 'UGX').' '.number_format($amount, 0);
     }
 
-    /** @return list<string> */
-    private static function admins(): array
+    /** The administrators: their ids and emails. */
+    private static function admins(): \Illuminate\Support\Collection
     {
         $model = config('auth.providers.users.model');
         $user = new $model;
@@ -80,9 +84,7 @@ final class OrderAlerts
             ->join('nevela_role_user', 'nevela_role_user.user_id', '=', DB::raw($user->getTable().'.'.$user->getKeyName()))
             ->join('nevela_roles', 'nevela_roles.id', '=', 'nevela_role_user.role_id')
             ->where('nevela_roles.name', 'ADMIN')
-            ->whereNotNull($user->getTable().'.email')
             ->distinct()
-            ->pluck($user->getTable().'.email')
-            ->all();
+            ->get([$user->getTable().'.'.$user->getKeyName().' as id', $user->getTable().'.email']);
     }
 }

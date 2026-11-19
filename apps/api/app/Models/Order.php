@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Support\OrderAlerts;
+use App\Support\Push;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -88,6 +89,27 @@ class Order extends Model
             if ($order->wasChanged('status') && $order->status === 'cancelled' && self::byCustomer()) {
                 DB::afterCommit(fn () => OrderAlerts::cancelled($order->fresh()));
             }
+        });
+
+        // The shop moved an order along ("Ready", "Out for delivery"): its customer gets a push,
+        // in the words of the bell. Not when the customer did it themselves.
+        static::updated(function (Order $order): void {
+            if (! $order->wasChanged('status') || self::byCustomer() || trim((string) $order->email) === '') {
+                return;
+            }
+            $model = config('auth.providers.users.model');
+            $owner = $model::query()->where('email', $order->email)->first();
+            if ($owner === null || (string) $owner->getKey() === (string) request()->user()?->getKey()) {
+                return;
+            }
+            try {
+                $status = $order->optionLabel('status');
+            } catch (\Throwable) {
+                $status = \Illuminate\Support\Str::headline((string) $order->status);
+            }
+            $title = "Your order {$order->number} is now {$status}";
+            $url = "/dashboard/orders/{$order->getKey()}";
+            DB::afterCommit(fn () => Push::send([$owner->getKey()], $title, 'Tap to see your order.', $url));
         });
     }
 }

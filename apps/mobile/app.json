@@ -19,7 +19,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "single",
@@ -46,6 +47,12 @@
           "photosPermission": "Lets you choose pictures to add to your records and your profile.",
           "cameraPermission": "Lets you take a photo to add to your records and your profile.",
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#D9480F"
         }
       ]
     ],

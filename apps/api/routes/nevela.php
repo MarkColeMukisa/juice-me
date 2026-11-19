@@ -35,3 +35,7 @@ Route::apiResource('posts', \App\Http\Controllers\Api\PostController::class);
 Route::get('likes', [\App\Http\Controllers\LikeController::class, 'index'])->name('likes.index');
 Route::put('likes/{beverage}', [\App\Http\Controllers\LikeController::class, 'store'])->middleware('throttle:120,1')->name('likes.store');
 Route::delete('likes/{beverage}', [\App\Http\Controllers\LikeController::class, 'destroy'])->middleware('throttle:120,1')->name('likes.destroy');
+
+// The phones that get push notifications (App\Http\Controllers\PushTokenController).
+Route::put('push-tokens', [\App\Http\Controllers\PushTokenController::class, 'store'])->middleware('throttle:30,1')->name('push-tokens.store');
+Route::delete('push-tokens/{token}', [\App\Http\Controllers\PushTokenController::class, 'destroy'])->where('token', '.*')->middleware('throttle:30,1')->name('push-tokens.destroy');

@@ -5,8 +5,14 @@ import { AppState, Platform } from "react-native";
 
 import { AlertBanner } from "@/components/alert-banner";
 import type { Inbox } from "@/app/notifications";
+import * as Notifications from "expo-notifications";
+
 import { api } from "./api";
 import { useAuth } from "./auth";
+import { pushSupported, registerPush, urlOf } from "./push";
+
+/** The push already acted on, so the one that opened the app isn't followed twice. */
+let followed: string | null = null;
 
 /** How often the bell is asked while the app is open. */
 const EVERY_MS = 20000;
@@ -43,7 +49,8 @@ const mark = (item: InboxItem) => `${item.id}|${item.count}|${item.at}`;
  * away when the app comes back to the front), and anything new slides down from the top with
  * a buzz: "Your order JM-0016 is now Ready". A tap opens the order.
  *
- * Expo Go can't be woken by a push when the app is closed; that comes with the built app.
+ * With the app closed, a push notification says the same (lib/push.ts): tapping it opens the
+ * order, and one arriving while the app is open brings the bell up to date at once.
  */
 export function AlertsProvider({ children }: { children: ReactNode }) {
   const { user, shell } = useAuth();
@@ -110,6 +117,17 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
     [],
   );
 
+  /** Where a link from the bell or a push leads, in the app: a customer's own order page, else the record. */
+  const go = useCallback(
+    (url: string | null) => {
+      const target = targetOf(url);
+      if (!target) router.push("/notifications");
+      else if (shell === "customer" && target.slug === "orders") router.push({ pathname: "/order/[id]", params: { id: target.id } });
+      else router.push({ pathname: "/r/[slug]/[id]", params: target });
+    },
+    [shell],
+  );
+
   const value = useMemo<Alerts>(() => {
     const unreadAbout = (slug: string, id?: string) =>
       (inbox?.items ?? []).filter((item) => {
@@ -119,13 +137,30 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
       });
     const open = (item: InboxItem) => {
       void markRead([item.id]);
-      const target = targetOf(item.url);
-      if (!target) router.push("/notifications");
-      else if (shell === "customer" && target.slug === "orders") router.push({ pathname: "/order/[id]", params: { id: target.id } });
-      else router.push({ pathname: "/r/[slug]/[id]", params: target });
+      go(item.url);
     };
     return { inbox, unread: inbox?.unread ?? 0, unreadAbout, refresh: load, markRead, open };
-  }, [inbox, load, markRead, shell]);
+  }, [inbox, load, markRead, go]);
+
+  // Pushes: this phone is registered for whoever signs in, a tap opens what it is about, and
+  // one arriving with the app open is announced straight away instead of at the next ask.
+  useEffect(() => {
+    if (!pushSupported || me === null) return;
+    void registerPush();
+    const follow = (response: Notifications.NotificationResponse | null) => {
+      const id = response?.notification.request.identifier ?? null;
+      if (response == null || id === followed) return;
+      followed = id;
+      go(urlOf(response));
+    };
+    void Notifications.getLastNotificationResponseAsync().then(follow).catch(() => undefined);
+    const tapped = Notifications.addNotificationResponseReceivedListener(follow);
+    const arrived = Notifications.addNotificationReceivedListener(() => void load());
+    return () => {
+      tapped.remove();
+      arrived.remove();
+    };
+  }, [me, go, load]);
 
   return (
     <AlertsContext value={value}>
