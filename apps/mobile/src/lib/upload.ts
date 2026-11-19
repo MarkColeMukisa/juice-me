@@ -1,4 +1,3 @@
-import { File } from "expo-file-system";
 import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { Platform } from "react-native";
@@ -100,24 +99,30 @@ export async function pickImages(from: "library" | "camera", { many = false, squ
 }
 
 /**
- * The bytes of a picture on the phone, as the request sends them.
- *
- * On a phone they are read from the file itself. Reading it back with fetch("file://…") and
- * sending that Blob did not send the picture on Android (Expo's fetch, which replaces React
- * Native's): Laravel received something that wasn't an image and refused every photo, as
- * "doesn't contain image data". A browser's picture is a blob: URL, which fetch reads fine.
+ * A picture on the phone as Grit's Expo app sends one: a form whose file is named by its
+ * address ({ uri, name, type }). The phone's network code reads it from disk, so the bytes
+ * never pass through JavaScript, which on Android is where they stopped being the picture.
  */
-async function bytesOf(picked: Picked): Promise<ArrayBuffer | Blob> {
-  if (Platform.OS === "web") return (await fetch(picked.uri)).blob();
-  return new File(picked.uri).arrayBuffer();
+function formOf(picked: Picked): FormData {
+  const form = new FormData();
+  form.append("_method", "PUT");
+  // React Native's FormData takes a file descriptor; the DOM's types don't describe one.
+  form.append("file", { uri: picked.uri, name: picked.name, type: picked.type } as unknown as Blob);
+  return form;
+}
+
+/** Send a picture: a form from a phone, the file itself from a browser (a blob: URL there). */
+async function sendPicture<T>(path: string, picked: Picked): Promise<T> {
+  if (Platform.OS !== "web") return api.uploadForm<T>(path, formOf(picked), { name: picked.name });
+  return api.upload<T>(path, { body: await (await fetch(picked.uri)).blob(), type: picked.type }, { name: picked.name });
 }
 
 /** Send a picture to a resource's file field. Save the answer's `key` in the record. */
 export async function uploadTo(resource: string, field: string, picked: Picked): Promise<Uploaded> {
-  return api.upload<Uploaded>(`/_nevela/uploads/${encodeURIComponent(resource)}/${encodeURIComponent(field)}`, { body: await bytesOf(picked), type: picked.type }, { name: picked.name });
+  return sendPicture<Uploaded>(`/_nevela/uploads/${encodeURIComponent(resource)}/${encodeURIComponent(field)}`, picked);
 }
 
 /** Send a picture as the signed-in person's profile picture. Laravel saves it to their account. */
 export async function uploadAvatar(picked: Picked): Promise<void> {
-  await api.upload("/auth/avatar", { body: await bytesOf(picked), type: picked.type }, { name: picked.name });
+  await sendPicture("/auth/avatar", picked);
 }

@@ -2,6 +2,7 @@
   "expo": {
     "name": "Juice Me",
     "slug": "juice-me",
+    "owner": "markcole",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -11,6 +12,7 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.juiceme.app",
       "adaptiveIcon": {
         "backgroundColor": "#FFF4E0",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -50,6 +52,16 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "494c38fd-48db-47ad-aed8-4ed732aeeca8"
+      }
     }
   }
 }

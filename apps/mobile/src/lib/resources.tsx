@@ -163,6 +163,18 @@ export function ResourcesProvider({ children }: { children: ReactNode }) {
   const signedIn = user !== null;
   const account = user?.id ?? null;
 
+  // Loading starts in the same render as a sign-in or sign-out, not an effect after it. For
+  // that one render the app would otherwise see no one signed in, no shop to browse and
+  // nothing loading: the shop's screens were taken away under the person signing out, and
+  // React Navigation complained of a REMOVE_ROUTES no navigator handled.
+  const who = `${signedIn}:${account}`;
+  const [loadedFor, setLoadedFor] = useState(who);
+  if (loadedFor !== who) {
+    setLoadedFor(who);
+    setAll([]);
+    setLoading(true);
+  }
+
   // Each load is numbered: an answer that comes back after someone signed in or out, for
   // whoever was there before, is dropped, not shown to the next person.
   const latest = useRef(0);

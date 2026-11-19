@@ -51,6 +51,11 @@ function Screens() {
   // Until it is known whether there is a shop to browse, the splash stays: else the sign-in
   // form would flash before the shop.
   const waiting = loading || (user === null && describing);
+  // Waiting holds the screens back only when the app opens. Once they are up they stay up:
+  // signing out also asks again whether there is a shop to browse, and taking every screen
+  // away for that moment left React Navigation with a REMOVE_ROUTES no navigator handled.
+  const [started, setStarted] = useState(false);
+  if (!waiting && !started) setStarted(true);
 
   useEffect(() => {
     if (!waiting) SplashScreen.hideAsync();
@@ -73,7 +78,7 @@ function Screens() {
     return () => clearTimeout(timer);
   }, [user, waiting]);
 
-  if (waiting) return null;
+  if (waiting && !started) return null;
 
   const base = dark ? DarkTheme : DefaultTheme;
   const theme = { ...base, colors: { ...base.colors, background: colors.background, card: colors.background, text: colors.text, border: colors.border, primary: colors.brand } };
@@ -83,7 +88,9 @@ function Screens() {
       <StatusBar style={dark ? "light" : "dark"} />
       <Stack screenOptions={{ headerBackButtonDisplayMode: "minimal", headerShadowVisible: false, contentStyle: { backgroundColor: colors.background } }}>
         {/* The shop, for someone signed in, and for anyone at all when what it sells is public. */}
-        <Stack.Protected guard={user !== null || browsing}>
+        {/* While it is being asked whether there is a shop to browse (just signed out), the
+            shop's screens stay, so the shop isn't taken away and put back a moment later. */}
+        <Stack.Protected guard={user !== null || browsing || (user === null && describing)}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="shop/[id]" options={{ title: "" }} />
         </Stack.Protected>

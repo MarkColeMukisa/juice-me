@@ -12,7 +12,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // A phone sends a picture as a form; Nevela takes the file as the body (see the class).
+        $middleware->api(append: [\App\Http\Middleware\UploadsFromForms::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

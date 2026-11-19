@@ -111,8 +111,29 @@ async function tokens() {
   return cached;
 }
 
+/**
+ * A picture sent from a phone, as a form, with XMLHttpRequest: React Native's own network
+ * code reads a form's { uri, name, type } file from disk, so the bytes never go through
+ * JavaScript (on Android, every way they went through it, what reached Laravel was not the
+ * picture). No Content-Type is set: the form sets its own, with its boundary. Answers as
+ * fetch would.
+ */
+function sendFile(url: string, init: RequestInit, timeout: number): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(init.method ?? "PUT", url, true);
+    for (const [name, value] of Object.entries((init.headers ?? {}) as Record<string, string>)) xhr.setRequestHeader(name, value);
+    xhr.timeout = timeout;
+    xhr.onload = () => resolve(new Response(xhr.status === 204 || xhr.responseText === "" ? null : xhr.responseText, { status: xhr.status, headers: { "Content-Type": xhr.getResponseHeader("Content-Type") ?? "application/json" } }));
+    xhr.ontimeout = () => reject(new SlowAnswerError(true));
+    xhr.onerror = () => reject(new UnreachableError(API_URL));
+    xhr.send(init.body as FormData);
+  });
+}
+
 async function send(path: string, init: RequestInit, timeout = TIMEOUT_MS): Promise<Response> {
   const url = `${API_URL}${path}`;
+  if (Platform.OS !== "web" && init.body instanceof FormData) return sendFile(url, init, timeout);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeout);
   try {
@@ -177,7 +198,9 @@ interface Options {
   /** Sent as JSON. */
   body?: unknown;
   /** A file, sent as it is: the body of the request is the file, and `type` what it is. */
-  file?: { body: Blob | ArrayBuffer; type: string };
+  file?: { body: Blob; type: string };
+  /** A form holding a file, as a phone sends a picture. Its own Content-Type is kept. */
+  form?: FormData;
   /** Longer than the usual wait, for a photo going up over a phone's connection. */
   timeout?: number;
   query?: Record<string, string | number | boolean | null | undefined>;
@@ -185,7 +208,7 @@ interface Options {
   auth?: boolean;
 }
 
-async function request<T>(path: string, { method = "GET", body, file, query, auth = true, timeout }: Options = {}): Promise<T> {
+async function request<T>(path: string, { method = "GET", body, file, form, query, auth = true, timeout }: Options = {}): Promise<T> {
   const search = Object.entries(query ?? {})
     .filter(([, value]) => value !== undefined && value !== null && value !== "")
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
@@ -195,12 +218,12 @@ async function request<T>(path: string, { method = "GET", body, file, query, aut
   const attempt = async (): Promise<Response> => {
     const headers: Record<string, string> = { Accept: "application/json" };
     if (file) headers["Content-Type"] = file.type;
-    else if (body !== undefined) headers["Content-Type"] = "application/json";
+    else if (body !== undefined && !form) headers["Content-Type"] = "application/json";
     if (auth) {
       const held = await tokens();
       if (held.access) headers.Authorization = `Bearer ${held.access}`;
     }
-    return send(target, { method, headers, body: file ? file.body : body === undefined ? undefined : JSON.stringify(body) }, timeout);
+    return send(target, { method, headers, body: form ?? (file ? file.body : body === undefined ? undefined : JSON.stringify(body)) }, timeout);
   };
 
   if (auth) {
@@ -235,7 +258,12 @@ export const api = {
   put: <T>(path: string, body: unknown) => request<T>(path, { method: "PUT", body }),
   delete: <T = null>(path: string) => request<T>(path, { method: "DELETE" }),
   /** PUT a file: the request's body is the file itself, which is how Laravel takes an upload. */
-  upload: <T>(path: string, file: { body: Blob | ArrayBuffer; type: string }, query?: Options["query"]) => request<T>(path, { method: "PUT", file, query, timeout: UPLOAD_TIMEOUT_MS }),
+  upload: <T>(path: string, file: { body: Blob; type: string }, query?: Options["query"]) => request<T>(path, { method: "PUT", file, query, timeout: UPLOAD_TIMEOUT_MS }),
+  /**
+   * The same upload from a phone: a form, POSTed with _method=PUT (PHP only reads forms sent
+   * by POST). Laravel's UploadsFromForms makes the file in it the body Nevela expects.
+   */
+  uploadForm: <T>(path: string, form: FormData, query?: Options["query"]) => request<T>(path, { method: "POST", form, query, timeout: UPLOAD_TIMEOUT_MS }),
 
   async hasToken(): Promise<boolean> {
     const held = await tokens();
