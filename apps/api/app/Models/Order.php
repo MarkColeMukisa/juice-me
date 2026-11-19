@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use App\Support\OrderAlerts;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Order extends Model
 {
@@ -52,6 +54,20 @@ class Order extends Model
     public function itemsSaved(): void
     {
         $this->update(['total' => round($this->orderItems()->get()->sum(fn (OrderItem $item) => $item->quantity * $item->price), 2)]);
+
+        // A customer's new order, with its items and total: the administrators are emailed,
+        // once it is saved for good.
+        if ($this->wasRecentlyCreated && self::byCustomer()) {
+            DB::afterCommit(fn () => OrderAlerts::placed($this->fresh()));
+        }
+    }
+
+    /** Someone signed in who doesn't run the shop (staff may edit orders). */
+    private static function byCustomer(): bool
+    {
+        $user = request()->user();
+
+        return $user !== null && ! $user->can('orders.edit');
     }
 
     protected static function booted(): void
@@ -65,6 +81,13 @@ class Order extends Model
             // for these is ignored: they aren't for the person it helps to choose.
             $order->total = null;
             $order->number = \Nevela\Laravel\Support\Numbering::next($order->getTable(), 'number', 'JM');
+        });
+
+        // A customer called their order off: the administrators are emailed, so no one makes it.
+        static::updated(function (Order $order): void {
+            if ($order->wasChanged('status') && $order->status === 'cancelled' && self::byCustomer()) {
+                DB::afterCommit(fn () => OrderAlerts::cancelled($order->fresh()));
+            }
         });
     }
 }

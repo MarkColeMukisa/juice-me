@@ -26,7 +26,8 @@ class LikesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        Role::query()->create(['name' => 'CUSTOMER', 'description' => null, 'grants' => ['beverages.view', 'categories.view', 'orders.view', 'orders.create'], 'is_system' => false]);
+        // CUSTOMER is one of the app's two roles, made by its migration.
+        $this->assertNotNull(Role::query()->where('name', 'CUSTOMER')->first());
         $this->amara = User::factory()->create(['email' => 'amara@example.com']);
         Access::grant($this->amara, 'CUSTOMER');
         $this->bo = User::factory()->create(['email' => 'bo@example.com']);
