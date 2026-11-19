@@ -31,8 +31,9 @@ final class OrderAlerts
             ))->all(),
             'Total: '.self::money((float) $order->total),
         ];
-        if (trim((string) $order->details) !== '') {
-            $lines[] = 'Note from the customer: '.trim((string) $order->details);
+        // The order form asks "Where to deliver" only for a delivery.
+        if ($order->delivery === 'delivery' && trim((string) $order->details) !== '') {
+            $lines[] = 'Delivery place: '.trim((string) $order->details);
         }
 
         self::send("New order {$order->number}: ".self::money((float) $order->total), $lines, $order);
