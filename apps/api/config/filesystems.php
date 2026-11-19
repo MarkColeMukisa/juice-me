@@ -32,7 +32,9 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app/private'),
+            // FILES_ROOT: where files are kept when storage/app isn't kept between deploys,
+            // such as a hosted app's persistent disk (/data/files on Sevalla).
+            'root' => rtrim(env('FILES_ROOT', storage_path('app')), '/').'/private',
             'serve' => true,
             'throw' => false,
             'report' => false,
@@ -40,7 +42,7 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
+            'root' => rtrim(env('FILES_ROOT', storage_path('app')), '/').'/public',
             'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
             'visibility' => 'public',
             'throw' => false,
