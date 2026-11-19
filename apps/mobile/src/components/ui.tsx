@@ -32,9 +32,9 @@ export function Screen({ children, edges = ["top"], refreshControl, centered = f
   );
 }
 
-export function Title({ children }: { children: ReactNode }) {
+export function Title({ children, center = false }: { children: ReactNode; center?: boolean }) {
   const colors = useColors();
-  return <Text accessibilityRole="header" style={[styles.title, { color: colors.text }]}>{children}</Text>;
+  return <Text accessibilityRole="header" style={[styles.title, { color: colors.text }, center && { textAlign: "center" }]}>{children}</Text>;
 }
 
 export function Heading({ children }: { children: ReactNode }) {
@@ -42,9 +42,9 @@ export function Heading({ children }: { children: ReactNode }) {
   return <Text accessibilityRole="header" style={[styles.heading, { color: colors.muted }]}>{children}</Text>;
 }
 
-export function Body({ children, muted = false, small = false }: { children: ReactNode; muted?: boolean; small?: boolean }) {
+export function Body({ children, muted = false, small = false, center = false }: { children: ReactNode; muted?: boolean; small?: boolean; center?: boolean }) {
   const colors = useColors();
-  return <Text style={{ color: muted ? colors.muted : colors.text, fontSize: small ? text.small : text.body, lineHeight: small ? 18 : 22 }}>{children}</Text>;
+  return <Text style={{ color: muted ? colors.muted : colors.text, fontSize: small ? text.small : text.body, lineHeight: small ? 18 : 22, textAlign: center ? "center" : undefined }}>{children}</Text>;
 }
 
 /** A message about what just happened: a refusal in red, good news in green. */

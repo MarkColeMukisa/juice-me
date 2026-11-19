@@ -136,10 +136,10 @@ export default function SignUp() {
 
   return (
     <Screen edges={["top", "bottom"]} centered>
-      <View style={{ gap: spacing.xs }}>
+      <View style={{ gap: spacing.xs, alignItems: "center" }}>
         <Logo />
-        <Title>Create your account</Title>
-        <Body muted>Join {site.name}. It takes a minute.</Body>
+        <Title center>Create your account</Title>
+        <Body muted center>Join {site.name}. It takes a minute.</Body>
       </View>
 
       {slow ? (

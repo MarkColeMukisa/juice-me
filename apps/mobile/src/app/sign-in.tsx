@@ -99,10 +99,10 @@ export default function SignIn() {
 
   return (
     <Screen edges={["top", "bottom"]} centered>
-      <View style={{ gap: spacing.xs }}>
+      <View style={{ gap: spacing.xs, alignItems: "center" }}>
         <Logo />
-        <Title>{site.name}</Title>
-        <Body muted>{way === "verify" ? `Verify your email first: enter the 6-digit code we just sent to ${address}.` : way === "password" ? (params.reason === "cart" ? "Sign in to add it to your cart. You'll come back to it." : params.reason === "like" ? "Sign in to keep the drinks you like. You'll come back to it." : "Sign in to continue.") : codeSent ? `Enter the code we sent to ${address}.` : "We'll email you a code to sign in with."}</Body>
+        <Title center>{site.name}</Title>
+        <Body muted center>{way === "verify" ? `Verify your email first: enter the 6-digit code we just sent to ${address}.` : way === "password" ? (params.reason === "cart" ? "Sign in to add it to your cart. You'll come back to it." : params.reason === "like" ? "Sign in to keep the drinks you like. You'll come back to it." : "Sign in to continue.") : codeSent ? `Enter the code we sent to ${address}.` : "We'll email you a code to sign in with."}</Body>
       </View>
 
       {error && !(error instanceof ApiError && error.issues.length > 0) ? <Notice>{messageOf(error)}</Notice> : null}
