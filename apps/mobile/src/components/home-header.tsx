@@ -55,8 +55,8 @@ export function HomeHeader({ unread }: { unread: number }) {
       <Pressable accessibilityRole="button" accessibilityLabel={unread > 0 ? `Notifications, ${unread} new` : "Notifications"} hitSlop={8} onPress={() => router.push("/notifications")} style={[styles.round, { borderColor: colors.border, backgroundColor: colors.surface }]}>
         <Ionicons name="notifications-outline" size={20} color={colors.text} />
         {unread > 0 ? (
-          <View style={[styles.badge, { backgroundColor: colors.danger, borderColor: colors.background }]}>
-            <Text style={styles.badgeText}>{unread > 9 ? "9+" : unread}</Text>
+          <View style={[styles.badge, { backgroundColor: colors.brand, borderColor: colors.background }]}>
+            <Text style={[styles.badgeText, { color: colors.onBrand }]}>{unread > 9 ? "9+" : unread}</Text>
           </View>
         ) : null}
       </Pressable>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   header: { flexDirection: "row", alignItems: "center", gap: spacing.md },
   round: { width: 40, height: 40, borderRadius: 20, borderWidth: 1, alignItems: "center", justifyContent: "center" },
   badge: { position: "absolute", top: -4, right: -4, minWidth: 18, height: 18, paddingHorizontal: 4, borderRadius: 9, borderWidth: 2, alignItems: "center", justifyContent: "center" },
-  badgeText: { color: "#ffffff", fontSize: 10, fontWeight: "700" },
+  badgeText: { fontSize: 10, fontWeight: "700" },
   avatar: { width: 40, height: 40, borderRadius: 20 },
   initials: { alignItems: "center", justifyContent: "center" },
   empty: { borderWidth: 1, borderRadius: radius.lg, padding: spacing.lg, gap: spacing.sm },

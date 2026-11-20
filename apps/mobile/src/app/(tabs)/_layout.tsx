@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router/js-tabs";
 import type { ComponentProps } from "react";
-import { useColorScheme } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TAB_BAR_HEIGHT } from "@/components/ui";
@@ -12,10 +12,12 @@ import { useColors } from "@/lib/theme";
 
 type IconName = ComponentProps<typeof Ionicons>["name"];
 
-/** A floating bar, clear of the phone's own gesture area, with a lifted shadow. */
+/**
+ * A flat bar along the bottom with a hairline above it. The active tab's icon sits in a soft
+ * orange pill; the others are grey.
+ */
 export default function TabsLayout() {
   const colors = useColors();
-  const dark = useColorScheme() === "dark";
   const insets = useSafeAreaInsets();
   // Customers have no Records tab: that is how staff work with the data. What they may see is on their home.
   const { shell, user } = useAuth();
@@ -29,33 +31,29 @@ export default function TabsLayout() {
   const cart = useCart();
   // News about their orders not yet seen: a badge on Orders.
   const orderNews = useAlerts().unreadAbout("orders").length;
-  const icon = (name: IconName, active: IconName) => ({ focused, size }: { focused: boolean; size: number }) => <Ionicons name={focused ? active : name} color={focused ? colors.accent : colors.muted} size={size} />;
+  const icon = (name: IconName, active: IconName) => ({ focused }: { focused: boolean }) => (
+    <View style={[styles.pill, focused && { backgroundColor: colors.brandSoft }]}>
+      <Ionicons name={focused ? active : name} color={focused ? colors.brand : colors.muted} size={22} />
+    </View>
+  );
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.accent,
+        tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.muted,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
-        tabBarItemStyle: { paddingTop: 4 },
+        tabBarLabelStyle: { fontSize: 12, fontWeight: "600", marginTop: 2 },
+        tabBarItemStyle: { paddingTop: 6 },
+        tabBarBadgeStyle: { backgroundColor: colors.brand, color: colors.onBrand, fontSize: 10, fontWeight: "700", borderWidth: 1.5, borderColor: colors.tabBar },
         tabBarStyle: {
-          position: "absolute",
-          left: 16,
-          right: 16,
-          bottom: Math.max(insets.bottom, 10) + 6,
-          height: TAB_BAR_HEIGHT,
-          paddingBottom: 10,
-          borderRadius: 24,
-          borderTopWidth: 0,
-          borderWidth: 1,
-          borderColor: colors.border,
+          height: TAB_BAR_HEIGHT + Math.max(insets.bottom, 8),
+          paddingBottom: Math.max(insets.bottom, 8),
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: colors.border,
           backgroundColor: colors.tabBar,
-          elevation: 12,
-          shadowColor: "#000000",
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: dark ? 0.35 : 0.12,
-          shadowRadius: 16,
+          elevation: 0,
+          shadowOpacity: 0,
         },
       }}>
       <Tabs.Screen name="index" options={{ title: buying || guest ? "Shop" : "Home", tabBarIcon: icon(buying || guest ? "storefront-outline" : "grid-outline", buying || guest ? "storefront" : "grid") }} />
@@ -68,3 +66,7 @@ export default function TabsLayout() {
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  pill: { width: 60, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+});

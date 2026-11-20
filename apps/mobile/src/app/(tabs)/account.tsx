@@ -77,8 +77,8 @@ export default function Account() {
         {user.image ? (
           <Image source={{ uri: user.image }} style={styles.avatar} contentFit="cover" cachePolicy="memory-disk" transition={150} accessibilityLabel="Your profile picture" />
         ) : (
-          <View style={[styles.avatar, styles.initials, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={{ color: colors.text, fontSize: text.heading, fontWeight: "600" }}>{initials}</Text>
+          <View style={[styles.avatar, styles.initials, { backgroundColor: colors.brandSoft, borderColor: colors.brandSoft }]}>
+            <Text style={{ color: colors.brand, fontSize: text.heading, fontWeight: "700" }}>{initials}</Text>
           </View>
         )}
         <View style={{ flex: 1, gap: 2 }}>

@@ -15,7 +15,7 @@ export function Stepper({ value, onChange, min = 1, label }: { value: number; on
       disabled={disabled}
       hitSlop={6}
       onPress={() => onChange(to)}
-      style={({ pressed }) => [styles.button, { borderColor: colors.border, backgroundColor: colors.surface }, (pressed || disabled) && { opacity: 0.5 }]}>
+      style={({ pressed }) => [styles.button, { backgroundColor: colors.fill }, pressed && { transform: [{ scale: 0.95 }] }, disabled && { opacity: 0.45 }]}>
       <Ionicons name={name} size={18} color={colors.text} />
     </Pressable>
   );
@@ -31,5 +31,5 @@ export function Stepper({ value, onChange, min = 1, label }: { value: number; on
 
 const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
-  button: { width: 34, height: 34, borderRadius: 17, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  button: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
 });

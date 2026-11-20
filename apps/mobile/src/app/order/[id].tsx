@@ -148,7 +148,9 @@ function Order({ shop, id }: { shop: Shop; id: string }) {
   const delivery = String(data.delivery ?? "collection");
   const over = OVER.includes(status);
   const statusField = shop.orders.fields.status;
-  const badge = status === "cancelled" ? colors.danger : status === "completed" ? colors.success : colors.accent;
+  // A soft tint with the word in its own colour: red when cancelled, green when done, orange on the way.
+  const badge = status === "cancelled" ? colors.danger : status === "completed" ? colors.success : colors.brand;
+  const badgeTint = status === "cancelled" ? colors.dangerSoft : status === "completed" ? colors.successSoft : colors.brandSoft;
   const statusName = statusField?.optionLabels?.[status] ?? status.charAt(0).toUpperCase() + status.slice(1);
 
   // Done or cancelled: the same again, what can still be had, in the cart.
@@ -186,8 +188,8 @@ function Order({ shop, id }: { shop: Shop; id: string }) {
           </Text>
           <Body muted small>Placed {when(String(data.createdAt ?? ""))}</Body>
         </View>
-        <View style={[styles.badge, { backgroundColor: badge }]}>
-          <Text style={{ color: "#ffffff", fontWeight: "700", fontSize: text.small }}>{statusName}</Text>
+        <View style={[styles.badge, { backgroundColor: badgeTint }]}>
+          <Text style={{ color: badge, fontWeight: "700", fontSize: text.small }}>{statusName}</Text>
         </View>
       </View>
 

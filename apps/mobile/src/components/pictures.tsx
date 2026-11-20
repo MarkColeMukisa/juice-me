@@ -34,8 +34,8 @@ export function Picture({ file, size = 44, shape = "square", rendition }: { file
   const uri = pictureUrl(file, rendition ?? (points > 96 ? "card" : "thumb"));
   const frame =
     size === "fill"
-      ? { width: "100%" as const, aspectRatio: 1, borderRadius: radius.md, backgroundColor: colors.surface }
-      : { width: size, height: size, borderRadius: shape === "round" ? size / 2 : size > 96 ? radius.md : radius.sm, backgroundColor: colors.surface };
+      ? { width: "100%" as const, aspectRatio: 1, borderRadius: radius.md, backgroundColor: colors.fill }
+      : { width: size, height: size, borderRadius: shape === "round" ? size / 2 : size > 96 ? radius.md : radius.sm, backgroundColor: colors.fill };
   if (!uri) return <View style={frame} />;
   return <Image source={{ uri }} style={frame} contentFit="cover" cachePolicy="memory-disk" transition={150} recyclingKey={uri} accessibilityLabel={file?.name} />;
 }
@@ -105,7 +105,7 @@ export function PictureField({ label, resource, name, many, value, known, proble
               </Pressable>
             </View>
           ))}
-          {sending > 0 ? <View style={[styles.sending, { backgroundColor: colors.surface }]}><ActivityIndicator color={colors.muted} /></View> : null}
+          {sending > 0 ? <View style={[styles.sending, { backgroundColor: colors.fill }]}><ActivityIndicator color={colors.muted} /></View> : null}
         </ScrollView>
       ) : null}
       {many || keys.length === 0 ? <AddPicture many={many} label="Library" busy={sending > 0} onPicked={add} onError={setError} /> : null}

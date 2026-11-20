@@ -111,12 +111,12 @@ export function ShopHome({ shop }: { shop: Catalogue }) {
     <Screen inTabs refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       <HomeHeader unread={inbox.data?.unread ?? 0} />
 
-      <View style={[styles.search, { borderColor: colors.border, backgroundColor: colors.surface }]}>
-        <Ionicons name="search-outline" size={18} color={colors.muted} />
+      <View style={[styles.search, { backgroundColor: colors.fill }]}>
+        <Ionicons name="search-outline" size={20} color={colors.muted} />
         <TextInput
           accessibilityLabel="Search"
           placeholder={`Search ${shop.catalogue.pluralLabel.toLowerCase()}`}
-          placeholderTextColor={colors.muted}
+          placeholderTextColor={colors.faint}
           value={search}
           onChangeText={setSearch}
           autoCorrect={false}
@@ -142,8 +142,8 @@ export function ShopHome({ shop }: { shop: Catalogue }) {
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
                 onPress={() => setCategory(chip.id)}
-                style={[styles.chip, { backgroundColor: on ? colors.brand : colors.surface, borderColor: on ? colors.brand : colors.border }]}>
-                <Text style={{ color: on ? colors.onBrand : colors.text, fontSize: text.small, fontWeight: "600" }}>{chip.title}</Text>
+                style={[styles.chip, { backgroundColor: on ? colors.brandSoft : colors.fill }]}>
+                <Text style={{ color: on ? colors.brand : colors.muted, fontSize: text.label, fontWeight: on ? "600" : "500" }}>{chip.title}</Text>
               </Pressable>
             );
           })}
@@ -203,11 +203,11 @@ export function ShopHome({ shop }: { shop: Catalogue }) {
 }
 
 const styles = StyleSheet.create({
-  search: { minHeight: 46, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  search: { minHeight: 48, borderRadius: radius.full, paddingHorizontal: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.sm },
   searchInput: { flex: 1, minHeight: 44, fontSize: text.body },
-  chip: { minHeight: 36, paddingHorizontal: spacing.lg, borderRadius: 18, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  chip: { minHeight: 34, paddingHorizontal: 14, borderRadius: radius.full, alignItems: "center", justifyContent: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: spacing.md },
-  card: { width: "48%", borderWidth: 1, borderRadius: radius.lg, overflow: "hidden" },
+  card: { width: "48%", borderWidth: StyleSheet.hairlineWidth, borderRadius: radius.lg, overflow: "hidden" },
   cardText: { padding: spacing.md, gap: 2 },
   add: { position: "absolute", right: spacing.sm, top: spacing.sm, minWidth: 34, height: 34, borderRadius: 17, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },
 });

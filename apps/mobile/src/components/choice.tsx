@@ -12,12 +12,12 @@ export function Choice({ label, on, onPress, disabled = false }: { label: string
       accessibilityState={{ checked: on, disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={[styles.choice, { backgroundColor: on ? colors.brand : colors.surface, borderColor: on ? colors.brand : colors.border }, disabled && { opacity: 0.45 }]}>
-      <Text style={{ color: on ? colors.onBrand : colors.text, fontSize: text.small, fontWeight: "600" }}>{label}</Text>
+      style={[styles.choice, { backgroundColor: on ? colors.brandSoft : colors.fill }, disabled && { opacity: 0.45 }]}>
+      <Text style={{ color: on ? colors.brand : colors.muted, fontSize: text.label, fontWeight: on ? "600" : "500" }}>{label}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  choice: { minHeight: 38, paddingHorizontal: spacing.lg, borderRadius: radius.lg + 8, borderWidth: 1, alignItems: "center", justifyContent: "center" },
+  choice: { minHeight: 36, paddingHorizontal: 14, borderRadius: radius.full, alignItems: "center", justifyContent: "center" },
 });

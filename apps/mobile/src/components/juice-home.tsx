@@ -147,12 +147,12 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
     <Screen inTabs scrollRef={scroller} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}>
       <HomeHeader unread={alerts.unread} />
 
-      <View style={[styles.search, { borderColor: colors.border, backgroundColor: colors.surface }]}>
-        <Ionicons name="search-outline" size={18} color={colors.muted} />
+      <View style={[styles.search, { backgroundColor: colors.fill }]}>
+        <Ionicons name="search-outline" size={20} color={colors.muted} />
         <TextInput
           accessibilityLabel="Search"
           placeholder="Search juices, smoothies, coffee…"
-          placeholderTextColor={colors.muted}
+          placeholderTextColor={colors.faint}
           value={search}
           onChangeText={setSearch}
           autoCorrect={false}
@@ -189,16 +189,18 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
       ) : null}
 
       {!searching && !category && (specials.data?.length ?? 0) > 0 ? (
-        <View style={[styles.specials, { backgroundColor: colors.accent }]}>
+        <View style={styles.specials}>
           <View style={styles.specialsHead}>
-            <Ionicons name="sparkles" size={18} color="#FFD27A" />
-            <Text style={styles.specialsTitle}>Today's specials</Text>
+            <View style={[styles.specialsIcon, { backgroundColor: colors.brandSoft }]}>
+              <Ionicons name="sparkles" size={16} color={colors.brand} />
+            </View>
+            <Text style={[styles.heading, { color: colors.text }]}>Today's specials</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.md, paddingHorizontal: spacing.md }}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.md, paddingHorizontal: spacing.lg }} style={{ marginHorizontal: -spacing.lg }}>
             {(specials.data ?? []).map((item) => {
               const price = priceOf(shop, item);
               return (
-                <View key={item.id} style={[styles.special, { backgroundColor: colors.background }]}>
+                <View key={item.id} style={[styles.special, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                   <Pressable accessibilityRole="button" onPress={() => router.push({ pathname: "/shop/[id]", params: { id: recordKey(shop.catalogue, item) } })}>
                     <Picture file={pictureOf(shop, item)} size="fill" rendition="card" />
                     <View style={{ padding: spacing.sm, gap: 2 }}>
@@ -237,7 +239,7 @@ export function JuiceHome({ shop }: { shop: Catalogue }) {
           {items.map((item) => {
             const price = priceOf(shop, item);
             return (
-              <View key={item.id} style={[styles.card, { backgroundColor: colors.background, borderColor: colors.border }]}>
+              <View key={item.id} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <Pressable
                   accessibilityRole="button"
                   accessibilityLabel={`${titleOf(shop, item)}${price !== null && priceField ? `, ${display(priceField, price)}` : ""}`}
@@ -299,15 +301,15 @@ function Banners({ banners, width, onOpen }: { banners: ResourceRecord[]; width:
         {banners.map((banner) => {
           const file = pictureOfRecord(banner);
           return (
-            <Pressable key={banner.id} accessibilityRole="button" accessibilityLabel={String(banner.title ?? "")} onPress={() => onOpen(banner)} style={[styles.banner, { width, backgroundColor: colors.accent }]}>
+            <Pressable key={banner.id} accessibilityRole="button" accessibilityLabel={String(banner.title ?? "")} onPress={() => onOpen(banner)} style={[styles.banner, { width, backgroundColor: colors.fill }]}>
               {file ? <Image source={{ uri: file.url }} style={StyleSheet.absoluteFill} contentFit="cover" cachePolicy="memory-disk" transition={200} /> : null}
               <View style={[StyleSheet.absoluteFill, styles.shade]} />
               <View style={styles.bannerText}>
                 <Text style={styles.bannerTitle}>{String(banner.title ?? "")}</Text>
                 {banner.subtitle ? <Text style={styles.bannerSubtitle}>{String(banner.subtitle)}</Text> : null}
                 <View style={[styles.bannerButton, { backgroundColor: colors.brand }]}>
-                  <Text style={{ color: "#ffffff", fontWeight: "700", fontSize: text.small }}>Order now</Text>
-                  <Ionicons name="arrow-forward" size={14} color="#ffffff" />
+                  <Text style={{ color: colors.onBrand, fontWeight: "700", fontSize: text.small }}>Order now</Text>
+                  <Ionicons name="arrow-forward" size={14} color={colors.onBrand} />
                 </View>
               </View>
             </Pressable>
@@ -326,26 +328,27 @@ function Banners({ banners, width, onOpen }: { banners: ResourceRecord[]; width:
 }
 
 const styles = StyleSheet.create({
-  search: { minHeight: 48, borderWidth: 1, borderRadius: 24, paddingHorizontal: spacing.lg, flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  search: { minHeight: 48, borderRadius: radius.full, paddingHorizontal: spacing.lg, flexDirection: "row", alignItems: "center", gap: spacing.sm },
   searchInput: { flex: 1, minHeight: 44, fontSize: text.body },
-  heading: { fontSize: 18, fontWeight: "800", letterSpacing: -0.3 },
+  heading: { fontSize: 18, fontWeight: "700", letterSpacing: -0.2 },
   banner: { height: 180, overflow: "hidden", justifyContent: "flex-end" },
-  shade: { backgroundColor: "rgba(31, 18, 8, 0.45)" },
+  // Dark at the bottom, where the words are, so they read over any picture.
+  shade: { backgroundColor: "rgba(0, 0, 0, 0.38)" },
   bannerText: { padding: spacing.lg, gap: 4 },
   bannerTitle: { color: "#ffffff", fontSize: 22, fontWeight: "800", letterSpacing: -0.4 },
-  bannerSubtitle: { color: "#FFF4E0", fontSize: text.small },
-  bannerButton: { alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 6, marginTop: spacing.sm, paddingHorizontal: spacing.md, paddingVertical: 7, borderRadius: 16 },
+  bannerSubtitle: { color: "rgba(255, 255, 255, 0.88)", fontSize: text.small },
+  bannerButton: { alignSelf: "flex-start", flexDirection: "row", alignItems: "center", gap: 6, marginTop: spacing.sm, paddingHorizontal: spacing.lg, paddingVertical: 8, borderRadius: radius.full },
   dots: { flexDirection: "row", justifyContent: "center", gap: 6 },
   dot: { height: 8, borderRadius: 4 },
   tile: { alignItems: "center", gap: 6, width: 76 },
   tileRing: { borderWidth: 2, borderRadius: 40, padding: 2 },
-  specials: { borderRadius: radius.lg, paddingVertical: spacing.md, gap: spacing.md, marginHorizontal: -spacing.xs },
-  specialsHead: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: spacing.md },
-  specialsTitle: { color: "#ffffff", fontSize: 18, fontWeight: "800" },
-  special: { width: 140, borderRadius: radius.md, overflow: "hidden" },
+  specials: { gap: spacing.md },
+  specialsHead: { flexDirection: "row", alignItems: "center", gap: spacing.sm },
+  specialsIcon: { width: 28, height: 28, borderRadius: 14, alignItems: "center", justifyContent: "center" },
+  special: { width: 150, borderRadius: radius.lg, borderWidth: StyleSheet.hairlineWidth, overflow: "hidden" },
   drinksHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: spacing.md },
-  card: { width: "48%", borderWidth: 1, borderRadius: radius.lg, overflow: "hidden" },
+  card: { width: "48%", borderWidth: StyleSheet.hairlineWidth, borderRadius: radius.lg, overflow: "hidden" },
   cardText: { padding: spacing.md, gap: 2 },
   heart: { position: "absolute", left: spacing.sm, top: spacing.sm },
   add: { position: "absolute", right: spacing.sm, top: spacing.sm, minWidth: 32, alignItems: "center", justifyContent: "center", paddingHorizontal: 6 },

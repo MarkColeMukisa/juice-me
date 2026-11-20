@@ -25,7 +25,7 @@ export function StatusTrail({ field, value }: { field: FieldSpec; value: string 
         return (
           <View key={stage} accessible accessibilityLabel={`${optionLabel(field, stage)}${current ? ", now" : done ? ", done" : ""}`} style={styles.stage}>
             <View style={[styles.dot, { backgroundColor: current || done ? colors.accent : "transparent", borderColor: current || done ? colors.accent : colors.border }]}>
-              {done ? <Ionicons name="checkmark" size={12} color="#ffffff" /> : null}
+              {done ? <Ionicons name="checkmark" size={12} color={colors.background} /> : null}
             </View>
             <Text style={{ color: current ? colors.text : colors.muted, fontSize: text.small, fontWeight: current ? "700" : "500" }}>{optionLabel(field, stage)}</Text>
             {index < stages.length - 1 ? <View style={[styles.bar, { backgroundColor: done ? colors.accent : colors.border }]} /> : null}

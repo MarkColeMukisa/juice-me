@@ -1,28 +1,27 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type RefreshControlProps, type TextInputProps } from "react-native";
-import { SafeAreaView, useSafeAreaInsets, type Edge } from "react-native-safe-area-context";
+import { SafeAreaView, type Edge } from "react-native-safe-area-context";
 
 import { radius, spacing, text, useColors } from "@/lib/theme";
 
 /** The small set of pieces every screen is built from. */
 
-/** How tall the floating tab bar is, for screens that scroll beneath it. */
-export const TAB_BAR_HEIGHT = 68;
+/** How tall the tab bar's buttons are (the phone's own gesture area comes on top). */
+export const TAB_BAR_HEIGHT = 60;
 
 export type IconName = ComponentProps<typeof Ionicons>["name"];
 
 /** A screen's frame: safe areas, scrolling, and room for the keyboard. */
 export function Screen({ children, edges = ["top"], refreshControl, centered = false, inTabs = false, scrollRef }: { children: ReactNode; edges?: Edge[]; refreshControl?: React.ReactElement<RefreshControlProps>; centered?: boolean; inTabs?: boolean; scrollRef?: React.Ref<React.ComponentRef<typeof ScrollView>> }) {
   const colors = useColors();
-  const insets = useSafeAreaInsets();
   return (
     <SafeAreaView edges={edges} style={[styles.fill, { backgroundColor: colors.background }]}>
       <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
           ref={scrollRef}
-          // On a tab, the last of the content must clear the floating tab bar.
-          contentContainerStyle={[styles.content, centered && styles.centered, inTabs && { paddingBottom: TAB_BAR_HEIGHT + Math.max(insets.bottom, 10) + spacing.xxl }]}
+          // The tab bar sits below the screen, not over it: a little room at the end is enough.
+          contentContainerStyle={[styles.content, centered && styles.centered, inTabs && { paddingBottom: spacing.xl }]}
           keyboardShouldPersistTaps="handled"
           refreshControl={refreshControl}>
           <View style={styles.column}>{children}</View>
@@ -52,8 +51,9 @@ export function Notice({ children, tone = "danger" }: { children: ReactNode; ton
   const colors = useColors();
   const colour = tone === "danger" ? colors.danger : colors.success;
   return (
-    <View accessibilityRole="alert" style={[styles.notice, { borderColor: colour }]}>
-      <Text style={{ color: colour, fontSize: text.small, lineHeight: 18 }}>{children}</Text>
+    <View accessibilityRole="alert" style={[styles.notice, { backgroundColor: tone === "danger" ? colors.dangerSoft : colors.successSoft }]}>
+      <Ionicons name={tone === "danger" ? "alert-circle" : "checkmark-circle"} size={20} color={colour} />
+      <Text style={{ flex: 1, color: colour, fontSize: text.small, lineHeight: 18, fontWeight: "500" }}>{children}</Text>
     </View>
   );
 }
@@ -61,7 +61,7 @@ export function Notice({ children, tone = "danger" }: { children: ReactNode; ton
 export function Button({ label, onPress, variant = "primary", busy = false, disabled = false, icon }: { label: string; onPress: () => void; variant?: "primary" | "secondary" | "danger" | "link"; busy?: boolean; disabled?: boolean; icon?: IconName }) {
   const colors = useColors();
   const off = busy || disabled;
-  const foreground = variant === "primary" ? colors.onBrand : variant === "danger" ? colors.danger : colors.text;
+  const foreground = variant === "primary" ? colors.onBrand : variant === "danger" ? colors.danger : variant === "link" ? colors.brand : colors.text;
   return (
     <Pressable
       accessibilityRole="button"
@@ -71,13 +71,15 @@ export function Button({ label, onPress, variant = "primary", busy = false, disa
       style={({ pressed }) => [
         variant === "link" ? styles.link : styles.button,
         variant === "primary" && { backgroundColor: colors.brand },
-        (variant === "secondary" || variant === "danger") && { borderWidth: 1, borderColor: variant === "danger" ? colors.danger : colors.border },
-        (pressed || off) && { opacity: 0.6 },
+        variant === "secondary" && { backgroundColor: colors.fill },
+        variant === "danger" && { backgroundColor: colors.dangerSoft },
+        pressed && { transform: [{ scale: 0.98 }], opacity: 0.85 },
+        off && !busy && { opacity: 0.45 },
       ]}>
       {busy ? <ActivityIndicator color={foreground} /> : (
         <>
-          {icon ? <Ionicons name={icon} size={18} color={foreground} /> : null}
-          <Text style={{ color: foreground, fontSize: variant === "link" ? text.small : text.body, fontWeight: "600" }}>{label}</Text>
+          {icon ? <Ionicons name={icon} size={20} color={foreground} /> : null}
+          <Text style={{ color: foreground, fontSize: variant === "link" ? text.label : text.lead, fontWeight: "600" }}>{label}</Text>
         </>
       )}
     </Pressable>
@@ -89,17 +91,21 @@ export function Field({ label, error, style, secureTextEntry, ...input }: { labe
   const colors = useColors();
   // A password box can be uncovered, so a person can check what they typed on a small keyboard.
   const [uncovered, setUncovered] = useState(false);
+  // Grey at rest; white with an orange edge while typing in it.
+  const [focused, setFocused] = useState(false);
   const hidden = Boolean(secureTextEntry) && !uncovered;
   return (
     <View style={styles.field}>
-      <Text style={{ color: colors.text, fontSize: text.small, fontWeight: "600" }}>{label}</Text>
+      <Text style={{ color: colors.muted, fontSize: text.small, fontWeight: "500" }}>{label}</Text>
       <View>
         <TextInput
           accessibilityLabel={label}
-          placeholderTextColor={colors.muted}
+          placeholderTextColor={colors.faint}
           {...input}
+          onFocus={(event) => { setFocused(true); input.onFocus?.(event); }}
+          onBlur={(event) => { setFocused(false); input.onBlur?.(event); }}
           secureTextEntry={hidden}
-          style={[styles.input, { color: colors.text, borderColor: error ? colors.danger : colors.border, backgroundColor: colors.background }, secureTextEntry && { paddingRight: 48 }, style]}
+          style={[styles.input, { color: colors.text, borderColor: error ? colors.danger : focused ? colors.brand : "transparent", backgroundColor: focused ? colors.background : colors.fill }, secureTextEntry && { paddingRight: 48 }, style]}
         />
         {secureTextEntry ? (
           <Pressable
@@ -163,14 +169,14 @@ const styles = StyleSheet.create({
   // A tablet or a browser window is wider than a form should be.
   column: { width: "100%", maxWidth: 560, alignSelf: "center", gap: spacing.lg },
   title: { fontSize: text.title, fontWeight: "700", letterSpacing: -0.5 },
-  heading: { fontSize: text.small, fontWeight: "600", textTransform: "uppercase", letterSpacing: 0.6 },
-  notice: { borderWidth: 1, borderRadius: radius.md, padding: spacing.md },
-  button: { minHeight: 48, borderRadius: radius.md, paddingHorizontal: spacing.lg, flexDirection: "row", gap: spacing.sm, alignItems: "center", justifyContent: "center" },
+  heading: { fontSize: text.label, fontWeight: "600", letterSpacing: 0.1 },
+  notice: { borderRadius: radius.md, padding: spacing.md, flexDirection: "row", gap: spacing.sm, alignItems: "flex-start" },
+  button: { minHeight: 48, borderRadius: radius.full, paddingHorizontal: 20, flexDirection: "row", gap: spacing.sm, alignItems: "center", justifyContent: "center" },
   link: { minHeight: 44, flexDirection: "row", gap: spacing.xs, alignItems: "center", justifyContent: "center" },
   field: { gap: spacing.xs },
   eye: { position: "absolute", right: 0, top: 0, bottom: 0, width: 48, alignItems: "center", justifyContent: "center" },
-  input: { minHeight: 48, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.md, fontSize: text.body },
-  card: { borderWidth: 1, borderRadius: radius.lg, overflow: "hidden" },
+  input: { minHeight: 48, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.lg, fontSize: text.body },
+  card: { borderWidth: StyleSheet.hairlineWidth, borderRadius: radius.lg, overflow: "hidden" },
   row: { minHeight: 52, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.md },
   rowText: { flex: 1, gap: 2 },
   rowValue: { maxWidth: "50%", fontSize: text.small },

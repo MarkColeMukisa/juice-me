@@ -85,7 +85,7 @@ export function OrderTimeline({ status, placedAt, delivery, steps, you }: { stat
           <View key={item.key} accessible accessibilityLabel={`${item.title}${item.time ? `, ${item.time}` : ""}${item.state === "now" ? ", now" : item.state === "ahead" ? ", still to come" : ""}. ${item.detail}`} style={styles.item}>
             <View style={styles.rail}>
               <View style={[styles.dot, { borderColor: dot, backgroundColor: lit ? dot : "transparent" }, item.state === "now" && { transform: [{ scale: 1.15 }] }]}>
-                {item.state === "done" ? <Ionicons name="checkmark" size={13} color="#ffffff" /> : item.state === "stopped" ? <Ionicons name="close" size={13} color="#ffffff" /> : item.state === "now" ? <View style={styles.inner} /> : null}
+                {item.state === "done" ? <Ionicons name="checkmark" size={13} color={colors.background} /> : item.state === "stopped" ? <Ionicons name="close" size={13} color={colors.background} /> : item.state === "now" ? <View style={[styles.inner, { backgroundColor: colors.background }]} /> : null}
               </View>
               {!last ? <View style={[styles.line, { backgroundColor: nextLit ? colors.accent : colors.border }]} /> : null}
             </View>
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   item: { flexDirection: "row", gap: spacing.md },
   rail: { alignItems: "center", width: 22 },
   dot: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, alignItems: "center", justifyContent: "center" },
-  inner: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#ffffff" },
+  inner: { width: 8, height: 8, borderRadius: 4 },
   line: { width: 2, flex: 1, marginVertical: 2 },
   body: { flex: 1 },
   head: { flexDirection: "row", alignItems: "baseline", gap: spacing.sm },
