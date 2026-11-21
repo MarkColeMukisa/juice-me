@@ -39,3 +39,4 @@ Route::delete('likes/{beverage}', [\App\Http\Controllers\LikeController::class, 
 // The phones that get push notifications (App\Http\Controllers\PushTokenController).
 Route::put('push-tokens', [\App\Http\Controllers\PushTokenController::class, 'store'])->middleware('throttle:30,1')->name('push-tokens.store');
 Route::delete('push-tokens/{token}', [\App\Http\Controllers\PushTokenController::class, 'destroy'])->where('token', '.*')->middleware('throttle:30,1')->name('push-tokens.destroy');
+Route::get('shop-figures', \App\Http\Controllers\ShopFiguresController::class)->middleware('throttle:60,1')->name('shop-figures');

@@ -14,6 +14,12 @@ class Order extends Model
 
     protected $table = 'orders';
 
+    /**
+     * What is in it comes along, in lists too: the app's order cards show the first drink and
+     * how many there are without asking for each order on its own.
+     */
+    protected $with = ['orderItems'];
+
     // nevela:generated:start hash=5d915157aa3a
     // Deleted records go to the trash, where they can be restored for a while.
     use \Nevela\Laravel\Concerns\Trashable;
