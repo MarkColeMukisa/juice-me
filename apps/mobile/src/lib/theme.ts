@@ -31,6 +31,11 @@ const light = {
   dangerSoft: "#FDECEC",
   success: "#1E8E4E",
   successSoft: "#E8F6EE",
+  /** Under way (accepted, preparing): blue, so orange stays for what needs you. */
+  info: "#2F6FDB",
+  infoSoft: "#EAF1FD",
+  /** The big buttons on sign-in: brighter than `brand`, with a bold label large enough to read on it. */
+  brandVivid: "#EA580C",
   /** Older names for the same orange, kept so every screen speaks one colour. */
   accent: "#C9410B",
   accentSoft: "#FFF1E8",
@@ -55,6 +60,9 @@ const dark: typeof light = {
   dangerSoft: "#2B1111",
   success: "#4ADE80",
   successSoft: "#0F2A1A",
+  info: "#7AA7FF",
+  infoSoft: "#0F1B33",
+  brandVivid: "#FF7A1A",
   accent: "#FF7A1A",
   accentSoft: "#2A1407",
   tabBar: "#000000",

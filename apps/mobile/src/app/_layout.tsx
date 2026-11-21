@@ -96,6 +96,7 @@ function Screens() {
         </Stack.Protected>
         {/* Signed in: the app. Signed out: only the sign-in screens, so no link can reach past them. */}
         <Stack.Protected guard={user !== null}>
+          <Stack.Screen name="profile" options={{ title: "Account" }} />
           <Stack.Screen name="devices" options={{ title: "Devices" }} />
           <Stack.Screen name="change-password" options={{ title: "Change password" }} />
           <Stack.Screen name="security" options={{ title: "Sign-in security" }} />

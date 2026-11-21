@@ -13,6 +13,14 @@ import { Image } from "expo-image";
 
 /** Your account: who you are here, your name, and how you sign in. */
 export default function Account() {
+  return <AccountScreen />;
+}
+
+/**
+ * The account itself: a customer's tab, and for staff a page opened from More (app/profile.tsx),
+ * with a way back. There, managing people and keeping track are left to More, which lists them.
+ */
+export function AccountScreen({ standalone = false }: { standalone?: boolean }) {
   const { user, reload, shell, signOut } = useAuth();
   const [leaving, setLeaving] = useState(false);
   const colors = useColors();
@@ -64,14 +72,14 @@ export default function Account() {
   };
 
   const initials = (user.name ?? user.email ?? "?").trim().split(/\s+/).slice(0, 2).map((word) => word[0]?.toUpperCase() ?? "").join("");
-  const manages = can(user, "users.view") || can(user, "roles.view");
+  const manages = !standalone && (can(user, "users.view") || can(user, "roles.view"));
   // The trash is for those who may delete something: Laravel narrows it to what they may deal with.
   const mayDelete = user.isAdmin || user.permissions.some((key) => key.endsWith(".delete"));
   const changed = name.trim() !== (user.name ?? "") && name.trim() !== "";
 
   return (
-    <Screen inTabs>
-      <Title>Account</Title>
+    <Screen inTabs={!standalone} edges={standalone ? ["bottom"] : undefined}>
+      {standalone ? null : <Title>Account</Title>}
 
       <View style={styles.who}>
         {user.image ? (
@@ -101,13 +109,13 @@ export default function Account() {
           <Row icon="shield-outline" label="Roles" value={user.roles.length > 0 ? user.roles.join(", ") : "None"} />
           <Row icon="mail-outline" label="Email" value={user.emailVerified ? "Verified" : "Not verified"} />
           <Row icon="key-outline" label="Two-step sign-in" value={user.twoFactorEnabled ? "On" : "Off"} onPress={() => router.push("/security")} last={!manages} />
-          {can(user, "users.view") ? <Row icon="people-outline" label="People" detail="Who can sign in, and their roles" onPress={() => router.push("/access/users")} last={!can(user, "roles.view")} /> : null}
-          {can(user, "roles.view") ? <Row icon="shield-checkmark-outline" label="Roles and permissions" detail="What each role may do" onPress={() => router.push("/access/roles")} last={!can(user, "activity.view") && !mayDelete} /> : null}
+          {manages && can(user, "users.view") ? <Row icon="people-outline" label="People" detail="Who can sign in, and their roles" onPress={() => router.push("/access/users")} last={!can(user, "roles.view")} /> : null}
+          {manages && can(user, "roles.view") ? <Row icon="shield-checkmark-outline" label="Roles and permissions" detail="What each role may do" onPress={() => router.push("/access/roles")} last={!can(user, "activity.view") && !mayDelete} /> : null}
         </Card>
-        {!manages ? <Body muted small>Roles are given by someone who may manage users.</Body> : null}
+        {!manages && !standalone ? <Body muted small>Roles are given by someone who may manage users.</Body> : null}
       </View>
 
-      {can(user, "activity.view") || mayDelete ? (
+      {!standalone && (can(user, "activity.view") || mayDelete) ? (
         <View style={{ gap: spacing.sm }}>
           <Heading>Keeping track</Heading>
           <Card>

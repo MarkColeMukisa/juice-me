@@ -13,10 +13,12 @@ export const TAB_BAR_HEIGHT = 60;
 export type IconName = ComponentProps<typeof Ionicons>["name"];
 
 /** A screen's frame: safe areas, scrolling, and room for the keyboard. */
-export function Screen({ children, edges = ["top"], refreshControl, centered = false, inTabs = false, scrollRef }: { children: ReactNode; edges?: Edge[]; refreshControl?: React.ReactElement<RefreshControlProps>; centered?: boolean; inTabs?: boolean; scrollRef?: React.Ref<React.ComponentRef<typeof ScrollView>> }) {
+export function Screen({ children, edges = ["top"], refreshControl, centered = false, inTabs = false, scrollRef, backdrop }: { children: ReactNode; edges?: Edge[]; refreshControl?: React.ReactElement<RefreshControlProps>; centered?: boolean; inTabs?: boolean; scrollRef?: React.Ref<React.ComponentRef<typeof ScrollView>>; backdrop?: ReactNode }) {
   const colors = useColors();
   return (
     <SafeAreaView edges={edges} style={[styles.fill, { backgroundColor: colors.background }]}>
+      {/* Behind everything, not scrolling with it: the soft shapes on the sign-in screens. */}
+      {backdrop ? <View pointerEvents="none" style={StyleSheet.absoluteFill}>{backdrop}</View> : null}
       <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <ScrollView
           ref={scrollRef}
@@ -58,10 +60,15 @@ export function Notice({ children, tone = "danger" }: { children: ReactNode; ton
   );
 }
 
-export function Button({ label, onPress, variant = "primary", busy = false, disabled = false, icon }: { label: string; onPress: () => void; variant?: "primary" | "secondary" | "danger" | "link"; busy?: boolean; disabled?: boolean; icon?: IconName }) {
+/**
+ * A button. `hero` is the one a screen is for (sign in, create the account): taller, brighter,
+ * with an arrow and a soft orange glow, and its label large and bold enough to read on it.
+ */
+export function Button({ label, onPress, variant = "primary", busy = false, disabled = false, icon, hero = false }: { label: string; onPress: () => void; variant?: "primary" | "secondary" | "danger" | "link"; busy?: boolean; disabled?: boolean; icon?: IconName; hero?: boolean }) {
   const colors = useColors();
   const off = busy || disabled;
-  const foreground = variant === "primary" ? colors.onBrand : variant === "danger" ? colors.danger : variant === "link" ? colors.brand : colors.text;
+  const dark = colors.background === "#000000";
+  const foreground = variant === "primary" ? (hero && !dark ? "#FFFFFF" : colors.onBrand) : variant === "danger" ? colors.danger : variant === "link" ? colors.brand : colors.text;
   return (
     <Pressable
       accessibilityRole="button"
@@ -70,7 +77,9 @@ export function Button({ label, onPress, variant = "primary", busy = false, disa
       onPress={onPress}
       style={({ pressed }) => [
         variant === "link" ? styles.link : styles.button,
-        variant === "primary" && { backgroundColor: colors.brand },
+        variant === "primary" && { backgroundColor: hero ? colors.brandVivid : colors.brand },
+        hero && styles.hero,
+        hero && !dark && !off && { shadowColor: colors.brandVivid, shadowOpacity: 0.3, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 6 },
         variant === "secondary" && { backgroundColor: colors.fill },
         variant === "danger" && { backgroundColor: colors.dangerSoft },
         pressed && { transform: [{ scale: 0.98 }], opacity: 0.85 },
@@ -79,34 +88,44 @@ export function Button({ label, onPress, variant = "primary", busy = false, disa
       {busy ? <ActivityIndicator color={foreground} /> : (
         <>
           {icon ? <Ionicons name={icon} size={20} color={foreground} /> : null}
-          <Text style={{ color: foreground, fontSize: variant === "link" ? text.label : text.lead, fontWeight: "600" }}>{label}</Text>
+          <Text style={{ color: foreground, fontSize: hero ? 19 : variant === "link" ? text.label : text.lead, fontWeight: hero ? "700" : "600" }}>{label}</Text>
+          {hero ? <Ionicons name="arrow-forward" size={20} color={foreground} /> : null}
         </>
       )}
     </Pressable>
   );
 }
 
-/** A labelled text box, with the server's complaint about it underneath when there is one. */
-export function Field({ label, error, style, secureTextEntry, ...input }: { label: string; error?: string } & TextInputProps) {
+/**
+ * A labelled text box, with the server's complaint about it underneath when there is one. A
+ * subtle border at rest and an orange one while typing; `icon` puts a small one at its start,
+ * and `inline` shows the label inside the box (as on sign-in) instead of above it.
+ */
+export function Field({ label, error, style, secureTextEntry, icon, inline = false, ...input }: { label: string; error?: string; icon?: IconName; inline?: boolean } & TextInputProps) {
   const colors = useColors();
   // A password box can be uncovered, so a person can check what they typed on a small keyboard.
   const [uncovered, setUncovered] = useState(false);
-  // Grey at rest; white with an orange edge while typing in it.
   const [focused, setFocused] = useState(false);
   const hidden = Boolean(secureTextEntry) && !uncovered;
   return (
     <View style={styles.field}>
-      <Text style={{ color: colors.muted, fontSize: text.small, fontWeight: "500" }}>{label}</Text>
+      {inline ? null : <Text style={{ color: colors.muted, fontSize: text.small, fontWeight: "500" }}>{label}</Text>}
       <View>
         <TextInput
           accessibilityLabel={label}
+          placeholder={inline ? label : undefined}
           placeholderTextColor={colors.faint}
           {...input}
           onFocus={(event) => { setFocused(true); input.onFocus?.(event); }}
           onBlur={(event) => { setFocused(false); input.onBlur?.(event); }}
           secureTextEntry={hidden}
-          style={[styles.input, { color: colors.text, borderColor: error ? colors.danger : focused ? colors.brand : "transparent", backgroundColor: focused ? colors.background : colors.fill }, secureTextEntry && { paddingRight: 48 }, style]}
+          style={[styles.input, { color: colors.text, borderColor: error ? colors.danger : focused ? colors.brand : colors.border, backgroundColor: colors.surface }, inline && styles.inputLarge, icon && { paddingLeft: 48 }, secureTextEntry && { paddingRight: 48 }, style]}
         />
+        {icon ? (
+          <View pointerEvents="none" style={styles.lead}>
+            <Ionicons name={icon} size={20} color={focused ? colors.brand : colors.muted} />
+          </View>
+        ) : null}
         {secureTextEntry ? (
           <Pressable
             accessibilityRole="button"
@@ -172,10 +191,13 @@ const styles = StyleSheet.create({
   heading: { fontSize: text.label, fontWeight: "600", letterSpacing: 0.1 },
   notice: { borderRadius: radius.md, padding: spacing.md, flexDirection: "row", gap: spacing.sm, alignItems: "flex-start" },
   button: { minHeight: 48, borderRadius: radius.full, paddingHorizontal: 20, flexDirection: "row", gap: spacing.sm, alignItems: "center", justifyContent: "center" },
+  hero: { minHeight: 56 },
   link: { minHeight: 44, flexDirection: "row", gap: spacing.xs, alignItems: "center", justifyContent: "center" },
   field: { gap: spacing.xs },
   eye: { position: "absolute", right: 0, top: 0, bottom: 0, width: 48, alignItems: "center", justifyContent: "center" },
   input: { minHeight: 48, borderWidth: 1, borderRadius: radius.md, paddingHorizontal: spacing.lg, fontSize: text.body },
+  inputLarge: { minHeight: 56, borderRadius: radius.lg, fontSize: text.lead },
+  lead: { position: "absolute", left: 0, top: 0, bottom: 0, width: 48, alignItems: "center", justifyContent: "center" },
   card: { borderWidth: StyleSheet.hairlineWidth, borderRadius: radius.lg, overflow: "hidden" },
   row: { minHeight: 52, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, flexDirection: "row", alignItems: "center", gap: spacing.md },
   rowText: { flex: 1, gap: 2 },

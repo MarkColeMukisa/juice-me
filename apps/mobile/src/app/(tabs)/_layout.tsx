@@ -31,6 +31,9 @@ export default function TabsLayout() {
   const cart = useCart();
   // News about their orders not yet seen: a badge on Orders.
   const orderNews = useAlerts().unreadAbout("orders").length;
+  // Staff: Home, Orders, Catalogue and More. Their account is a page under More.
+  const staff = user !== null && shell !== "customer";
+  const staffOrders = staff && shop !== null;
   const icon = (name: IconName, active: IconName) => ({ focused }: { focused: boolean }) => (
     <View style={[styles.pill, focused && { backgroundColor: colors.brandSoft }]}>
       <Ionicons name={focused ? active : name} color={focused ? colors.brand : colors.muted} size={22} />
@@ -56,13 +59,13 @@ export default function TabsLayout() {
           shadowOpacity: 0,
         },
       }}>
-      <Tabs.Screen name="index" options={{ title: buying || guest ? "Shop" : "Home", tabBarIcon: icon(buying || guest ? "storefront-outline" : "grid-outline", buying || guest ? "storefront" : "grid") }} />
-      <Tabs.Screen name="records" options={{ title: "Records", href: shell === "customer" || guest ? null : undefined, tabBarIcon: icon("albums-outline", "albums") }} />
+      <Tabs.Screen name="index" options={{ title: buying || guest ? "Shop" : "Home", tabBarIcon: icon(buying || guest ? "storefront-outline" : "home-outline", buying || guest ? "storefront" : "home") }} />
+      <Tabs.Screen name="orders" options={{ title: "Orders", href: (buying && tracking) || staffOrders ? undefined : null, tabBarBadge: buying && orderNews > 0 ? orderNews : undefined, tabBarIcon: icon(staff ? "bag-handle-outline" : "receipt-outline", staff ? "bag-handle" : "receipt") }} />
+      <Tabs.Screen name="records" options={{ title: "Catalogue", href: staff ? undefined : null, tabBarIcon: icon("grid-outline", "grid") }} />
       <Tabs.Screen name="likes" options={{ title: "Likes", href: buying ? undefined : null, tabBarIcon: icon("heart-outline", "heart") }} />
       <Tabs.Screen name="cart" options={{ title: "Cart", href: buying ? undefined : null, tabBarBadge: cart.count > 0 ? cart.count : undefined, tabBarIcon: icon("cart-outline", "cart") }} />
-      <Tabs.Screen name="orders" options={{ title: "Orders", href: buying && tracking ? undefined : null, tabBarBadge: buying && orderNews > 0 ? orderNews : undefined, tabBarIcon: icon("receipt-outline", "receipt") }} />
-      <Tabs.Screen name="account" options={{ title: "Account", tabBarIcon: icon("person-outline", "person") }} />
-      <Tabs.Screen name="settings" options={{ title: "Settings", href: guest || buying ? null : undefined, tabBarIcon: icon("settings-outline", "settings") }} />
+      <Tabs.Screen name="account" options={{ title: "Account", href: staff ? null : undefined, tabBarIcon: icon("person-outline", "person") }} />
+      <Tabs.Screen name="settings" options={{ title: "More", href: staff ? undefined : null, tabBarIcon: icon("ellipsis-horizontal-circle-outline", "ellipsis-horizontal-circle") }} />
     </Tabs>
   );
 }

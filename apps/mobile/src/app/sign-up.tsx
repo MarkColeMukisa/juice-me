@@ -4,8 +4,8 @@ import { View } from "react-native";
 
 import { SecondStep } from "@/components/second-step";
 import { SocialButtons } from "@/components/social-buttons";
-import { Logo } from "@/components/logo";
-import { Body, Button, Field, Notice, Screen, Title } from "@/components/ui";
+import { AuthBackdrop, AuthBrand, OrDivider, QuietAction, TextAction } from "@/components/auth-ui";
+import { Body, Button, Field, Notice, Screen } from "@/components/ui";
 import { ApiError, messageOf, SlowAnswerError } from "@/lib/api";
 import { signInMethods, useAuth, type Challenge } from "@/lib/auth";
 import { site } from "@/lib/site";
@@ -118,29 +118,22 @@ export default function SignUp() {
 
   if (stage === "verify") {
     return (
-      <Screen edges={["top", "bottom"]} centered>
-        <View style={{ gap: spacing.xs }}>
-          <Title>Check your email</Title>
-          <Body muted>We sent a code to {submitted}. Enter it to finish creating your account.</Body>
-        </View>
+      <Screen edges={["top", "bottom"]} centered backdrop={<AuthBackdrop />}>
+        <AuthBrand title="Check your email" subtitle={`We sent a code to ${submitted}. Enter it to finish creating your account.`} />
 
         {error ? <Notice>{messageOf(error)}</Notice> : sent ? <Notice tone="success">Code sent. It works for an hour.</Notice> : null}
 
-        <Field label="Code" value={code} onChangeText={setCode} keyboardType="number-pad" autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus returnKeyType="go" onSubmitEditing={verify} />
-        <Button label="Verify and continue" busy={busy} disabled={code.trim() === ""} onPress={verify} />
-        <Button variant="link" label="Send the code again" busy={sending} disabled={busy} onPress={again} />
-        <Button variant="link" label="Use a different email" disabled={busy} onPress={() => { setStage("form"); setCode(""); setError(null); setSent(false); }} />
+        <Field inline icon="keypad-outline" label="6-digit code" value={code} onChangeText={setCode} keyboardType="number-pad" autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus returnKeyType="go" onSubmitEditing={verify} />
+        <Button hero label="Verify and continue" busy={busy} disabled={code.trim() === ""} onPress={verify} />
+        <TextAction lead="No code?" action="Send it again" disabled={busy || sending} onPress={again} />
+        <QuietAction label="Use a different email" disabled={busy} onPress={() => { setStage("form"); setCode(""); setError(null); setSent(false); }} />
       </Screen>
     );
   }
 
   return (
-    <Screen edges={["top", "bottom"]} centered>
-      <View style={{ gap: spacing.xs, alignItems: "center" }}>
-        <Logo />
-        <Title center>Create your account</Title>
-        <Body muted center>Join {site.name}. It takes a minute.</Body>
-      </View>
+    <Screen edges={["top", "bottom"]} centered backdrop={<AuthBackdrop />}>
+      <AuthBrand title="Create account" subtitle={`Join ${site.name}. It takes a minute.`} />
 
       {slow ? (
         <Notice>The server took too long to answer. Your account may have been created: try signing in with the same email and password.</Notice>
@@ -149,16 +142,19 @@ export default function SignUp() {
       ) : null}
       {exists ? <Notice>An account with this email already exists.</Notice> : null}
 
-      <Field label="Name" value={name} onChangeText={setName} error={issue("name")} autoCapitalize="words" autoComplete="name" textContentType="name" returnKeyType="next" />
-      <Field label="Email" value={email} onChangeText={setEmail} error={issue("email")} autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" textContentType="emailAddress" returnKeyType="next" />
-      <Field label="Password" value={password} onChangeText={setPassword} error={issue("password")} secureTextEntry autoComplete="new-password" textContentType="newPassword" returnKeyType="go" onSubmitEditing={create} />
+      <Field inline icon="person-outline" label="Your name" value={name} onChangeText={setName} error={issue("name")} autoCapitalize="words" autoComplete="name" textContentType="name" returnKeyType="next" />
+      <Field inline icon="mail-outline" label="Email" value={email} onChangeText={setEmail} error={issue("email")} autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" textContentType="emailAddress" returnKeyType="next" />
+      <Field inline icon="lock-closed-outline" label="Password" value={password} onChangeText={setPassword} error={issue("password")} secureTextEntry autoComplete="new-password" textContentType="newPassword" returnKeyType="go" onSubmitEditing={create} />
       <Body muted small>At least {MIN_LENGTH} characters. A few unrelated words make a strong one.</Body>
 
-      <Button label="Create account" busy={busy} disabled={name.trim() === "" || address === "" || password.length < MIN_LENGTH || provider !== null} onPress={create} />
+      <Button hero label="Create account" busy={busy} disabled={name.trim() === "" || address === "" || password.length < MIN_LENGTH || provider !== null} onPress={create} />
       {exists || slow ? <Button variant="secondary" label="Sign in instead" disabled={busy} onPress={toSignIn} /> : null}
-      <SocialButtons providers={social} busy={provider} disabled={busy} onPick={withProvider} />
 
-      <Button variant="link" label="Already have an account? Sign in" disabled={busy} onPress={toSignIn} />
+      {social.length > 0 ? <OrDivider /> : null}
+      <SocialButtons divider={false} providers={social} busy={provider} disabled={busy} onPick={withProvider} />
+
+      <TextAction lead="Already have an account?" action="Sign in" disabled={busy} onPress={toSignIn} />
+      {router.canGoBack() ? <QuietAction label="Keep browsing" disabled={busy} onPress={() => router.back()} /> : null}
     </Screen>
   );
 }

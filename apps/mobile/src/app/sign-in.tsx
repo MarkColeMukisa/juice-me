@@ -4,8 +4,8 @@ import { View } from "react-native";
 
 import { SecondStep } from "@/components/second-step";
 import { SocialButtons } from "@/components/social-buttons";
-import { Logo } from "@/components/logo";
-import { Body, Button, Field, Notice, Screen, Title } from "@/components/ui";
+import { AuthBackdrop, AuthBrand, OrDivider, QuietAction, TextAction } from "@/components/auth-ui";
+import { Button, Field, Notice, Screen } from "@/components/ui";
 import { ApiError, messageOf } from "@/lib/api";
 import { signInMethods, useAuth, type Challenge } from "@/lib/auth";
 import { takeComeBack } from "@/lib/guest";
@@ -97,49 +97,65 @@ export default function SignIn() {
   const issue = (path: string) => (error instanceof ApiError ? error.issue(path) : undefined);
   const address = email.trim();
 
+  const subtitle =
+    way === "verify"
+      ? `Verify your email first: enter the 6-digit code we just sent to ${address}.`
+      : way === "password"
+        ? params.reason === "cart"
+          ? "Sign in to add it to your cart. You'll come back to it."
+          : params.reason === "like"
+            ? "Sign in to keep the drinks you like. You'll come back to it."
+            : "Sign in to continue"
+        : codeSent
+          ? `Enter the code we sent to ${address}.`
+          : "We'll email you a code to sign in with.";
+  const verify = () => run(async () => setChallenge(await auth.verifyEmail(address, code)));
+  const others = social.length > 0 || (emailCode && way !== "verify") || registration;
+
   return (
-    <Screen edges={["top", "bottom"]} centered>
-      <View style={{ gap: spacing.xs, alignItems: "center" }}>
-        <Logo />
-        <Title center>{site.name}</Title>
-        <Body muted center>{way === "verify" ? `Verify your email first: enter the 6-digit code we just sent to ${address}.` : way === "password" ? (params.reason === "cart" ? "Sign in to add it to your cart. You'll come back to it." : params.reason === "like" ? "Sign in to keep the drinks you like. You'll come back to it." : "Sign in to continue.") : codeSent ? `Enter the code we sent to ${address}.` : "We'll email you a code to sign in with."}</Body>
-      </View>
+    <Screen edges={["top", "bottom"]} centered backdrop={<AuthBackdrop />}>
+      <AuthBrand subtitle={subtitle} />
 
       {error && !(error instanceof ApiError && error.issues.length > 0) ? <Notice>{messageOf(error)}</Notice> : null}
 
-      <Field label="Email" value={email} onChangeText={setEmail} error={issue("email")} autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" textContentType="username" editable={!codeSent && way !== "verify"} returnKeyType="next" />
+      <Field inline icon="mail-outline" label="Email" value={email} onChangeText={setEmail} error={issue("email")} autoCapitalize="none" autoComplete="email" autoCorrect={false} keyboardType="email-address" textContentType="username" editable={!codeSent && way !== "verify"} returnKeyType="next" />
 
       {way === "verify" ? (
         <>
-          <Field label="Code" value={code} onChangeText={setCode} error={issue("code")} keyboardType="number-pad" autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus returnKeyType="go" onSubmitEditing={() => run(async () => setChallenge(await auth.verifyEmail(address, code)))} />
-          <Button label="Verify and sign in" busy={busy} disabled={code.trim() === ""} onPress={() => run(async () => setChallenge(await auth.verifyEmail(address, code)))} />
-          <Button variant="link" label="Send a new code" disabled={busy} onPress={() => run(async () => { await auth.resendVerification(address); setCode(""); })} />
-          <Button variant="link" label="Back" disabled={busy} onPress={() => { setWay("password"); setCode(""); setError(null); }} />
+          <Field inline icon="keypad-outline" label="6-digit code" value={code} onChangeText={setCode} error={issue("code")} keyboardType="number-pad" autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus returnKeyType="go" onSubmitEditing={verify} />
+          <Button hero label="Verify and sign in" busy={busy} disabled={code.trim() === ""} onPress={verify} />
+          <TextAction lead="No code?" action="Send a new one" disabled={busy} onPress={() => run(async () => { await auth.resendVerification(address); setCode(""); })} />
+          <QuietAction label="Back" disabled={busy} onPress={() => { setWay("password"); setCode(""); setError(null); }} />
         </>
       ) : way === "password" ? (
         <>
-          <Field label="Password" value={password} onChangeText={setPassword} error={issue("password")} secureTextEntry autoComplete="current-password" textContentType="password" returnKeyType="go" onSubmitEditing={withPassword} />
-          <Button label="Sign in" busy={busy} disabled={address === "" || password === "" || provider !== null} onPress={withPassword} />
+          <Field inline icon="lock-closed-outline" label="Password" value={password} onChangeText={setPassword} error={issue("password")} secureTextEntry autoComplete="current-password" textContentType="password" returnKeyType="go" onSubmitEditing={withPassword} />
+          <Button hero label="Sign in" busy={busy} disabled={address === "" || password === "" || provider !== null} onPress={withPassword} />
         </>
       ) : codeSent ? (
         <>
-          <Field label="Code" value={code} onChangeText={setCode} error={issue("code")} keyboardType="number-pad" autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus />
-          <Button label="Sign in" busy={busy} disabled={code.trim() === "" || provider !== null} onPress={() => run(async () => setChallenge(await auth.signInWithCode(address, code)))} />
-          <Button variant="link" label="Use a different email" onPress={() => { setCodeSent(false); setCode(""); setError(null); }} />
+          <Field inline icon="keypad-outline" label="6-digit code" value={code} onChangeText={setCode} error={issue("code")} keyboardType="number-pad" autoComplete="one-time-code" textContentType="oneTimeCode" autoFocus />
+          <Button hero label="Sign in" busy={busy} disabled={code.trim() === "" || provider !== null} onPress={() => run(async () => setChallenge(await auth.signInWithCode(address, code)))} />
+          <TextAction lead="Wrong address?" action="Use a different email" onPress={() => { setCodeSent(false); setCode(""); setError(null); }} />
         </>
       ) : (
-        <Button label="Email me a code" busy={busy} disabled={address === "" || provider !== null} onPress={() => run(async () => { await auth.sendEmailCode(address); setCodeSent(true); })} />
+        <Button hero label="Email me a code" busy={busy} disabled={address === "" || provider !== null} onPress={() => run(async () => { await auth.sendEmailCode(address); setCodeSent(true); })} />
       )}
 
-      <SocialButtons providers={social} busy={provider} disabled={busy} onPick={withProvider} />
+      {way !== "verify" && others ? <OrDivider /> : null}
+      {way !== "verify" ? <SocialButtons divider={false} providers={social} busy={provider} disabled={busy} onPick={withProvider} /> : null}
 
       {emailCode && way !== "verify" ? (
-        <Button variant="link" label={way === "password" ? "Sign in with an emailed code instead" : "Sign in with a password instead"} onPress={() => { setWay(way === "password" ? "code" : "password"); setCodeSent(false); setCode(""); setError(null); }} />
+        <TextAction
+          lead={way === "password" ? "Sign in with an" : "Sign in with a"}
+          action={way === "password" ? "emailed code instead" : "password instead"}
+          onPress={() => { setWay(way === "password" ? "code" : "password"); setCodeSent(false); setCode(""); setError(null); }}
+        />
       ) : null}
 
-      {registration ? <Button variant="link" label="New here? Create an account" disabled={busy} onPress={() => router.push("/sign-up")} /> : null}
+      {registration && way !== "verify" ? <TextAction lead="New here?" action="Create an account" disabled={busy} onPress={() => router.push("/sign-up")} /> : null}
       {/* Come from the shop, before signing in: back to it. */}
-      {router.canGoBack() ? <Button variant="link" label="Keep browsing" disabled={busy} onPress={() => { takeComeBack(); router.back(); }} /> : null}
+      {way !== "verify" && router.canGoBack() ? <QuietAction label="Keep browsing" disabled={busy} onPress={() => { takeComeBack(); router.back(); }} /> : null}
     </Screen>
   );
 }
