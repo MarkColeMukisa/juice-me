@@ -172,6 +172,10 @@ The emails are sent after commit, and a send failure is reported but never fails
 - a Firebase project, with `google-services.json` committed and `android.googleServicesFile` set in `app.json`;
 - the FCM V1 service account key uploaded with `npx eas-cli@latest credentials`. It's secret, so never commit it.
 - Without them, EAS Android builds fail.
+- **A notification icon:** a white silhouette on a transparent background, 96×96 and tightly cropped, set as `expo-notifications` → `icon` in `app.json`, with `color` set to the brand.
+  - Without it, Android shows a blank white square in the status bar.
+  - Make it from the adaptive icon's monochrome layer (`assets/images/notification-icon.png`).
+  - It's native config, so it needs a new build; an OTA update can't add it.
 - iOS needs an Apple Developer account.
 
 **Trap:**
