@@ -9,6 +9,7 @@ import { Button, Field, Notice, Screen } from "@/components/ui";
 import { ApiError, messageOf } from "@/lib/api";
 import { signInMethods, useAuth, type Challenge } from "@/lib/auth";
 import { takeComeBack } from "@/lib/guest";
+import { takeSignOutReason } from "@/lib/idle-clock";
 import { site } from "@/lib/site";
 import { spacing } from "@/lib/theme";
 
@@ -27,6 +28,8 @@ export default function SignIn() {
   // Sent here from sign-up with an address that already has an account: it is filled in.
   const params = useLocalSearchParams<{ email?: string; reason?: string }>();
   const [way, setWay] = useState<"password" | "code" | "verify">("password");
+  // Signed out for being away: said once, here.
+  const [why] = useState(takeSignOutReason);
   const [emailCode, setEmailCode] = useState(false);
   const [registration, setRegistration] = useState(false);
   const [social, setSocial] = useState<string[]>([]);
@@ -115,6 +118,8 @@ export default function SignIn() {
   return (
     <Screen edges={["top", "bottom"]} centered backdrop={<AuthBackdrop />}>
       <AuthBrand subtitle={subtitle} />
+
+      {why === "inactive" && !error ? <Notice>You were signed out after a while with no activity. Sign in again to carry on.</Notice> : null}
 
       {error && !(error instanceof ApiError && error.issues.length > 0) ? <Notice>{messageOf(error)}</Notice> : null}
 

@@ -3,9 +3,20 @@ import { createContext, use, useCallback, useEffect, useMemo, useRef, useState, 
 import { Platform } from "react-native";
 
 import { api, type TokenPair } from "./api";
+import { clearActive, idleExpired, markActive, noteIdleSignOut, saveActive } from "./idle-clock";
 import { forgetPush } from "./push";
 import { shellFor, type Shell } from "./shell";
 import { authorize } from "./social";
+
+/** End this phone's sign-in at Laravel and forget its tokens. Offline, it is forgotten all the same. */
+async function endSession(): Promise<void> {
+  try {
+    await api.delete("/auth/token");
+  } catch {
+    // Offline or already ended: the device forgets the sign-in either way.
+  }
+  await api.clearTokens();
+}
 
 /** The signed-in user, as `GET auth/me` describes them. */
 export interface User {
@@ -76,7 +87,8 @@ interface AuthContextValue {
   verifyEmail: (email: string, code: string) => Promise<Challenge | null>;
   /** Send the verification code again. */
   resendVerification: (email: string) => Promise<void>;
-  signOut: () => Promise<void>;
+  /** `keepPush`: signed out for being away, so the phone still gets its alerts (a new order). */
+  signOut: (options?: { keepPush?: boolean }) => Promise<void>;
   /** Read the user again, after a change to the profile. */
   reload: () => Promise<void>;
   /** Whether the user holds a permission, such as "users.view". */
@@ -133,7 +145,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         // Nothing stored: don't ask the network, so a first launch opens straight away.
-        if (await api.hasToken()) await reload();
+        if (await api.hasToken()) {
+          // Left signed in and unused past the limit: signed out before any screen shows,
+          // as the dashboard would have done. The phone keeps its pushes.
+          if (await idleExpired()) {
+            await endSession();
+            await clearActive();
+            noteIdleSignOut();
+            forget();
+            return;
+          }
+          markActive();
+          await reload();
+        }
       } catch {
         // Offline, or the sign-in has ended. Either way the sign-in screen is the place
         // to be; a sign-in that is still good is picked up again from there.
@@ -153,6 +177,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // already holds when the answer has none, which is right for a renewal and wrong here.
     await api.clearTokens();
     await api.setTokens(answer);
+    markActive();
+    void saveActive();
     era.current += 1;
     setUser(answer.user);
     return null;
@@ -188,17 +214,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resendVerification: async (email) => {
         await api.post("/auth/email/send", { email }, { auth: false });
       },
-      signOut: async () => {
-        // This phone's pushes stop first, while the sign-in still lets it say so.
-        await forgetPush();
+      signOut: async ({ keepPush = false } = {}) => {
+        // This phone's pushes stop first, while the sign-in still lets it say so. Signed out
+        // for being away, they carry on: the shop still hears about a new order.
+        if (!keepPush) await forgetPush();
         try {
-          await api.delete("/auth/token");
-        } catch {
-          // Offline or already ended: the device forgets the sign-in either way.
-        }
-        try {
-          await api.clearTokens();
+          await endSession();
         } finally {
+          void clearActive();
           forget(); // even if the keychain refused, the app is signed out
         }
       },
