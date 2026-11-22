@@ -8,6 +8,16 @@ This is what Juice Me needed beyond Nevela's scaffold to become a shippable prod
 
 Paths are relative to the repo root.
 
+> **Decided for Nevela (2026-11-22):**
+> - Shop pieces go **only to shop apps**: figures, order cards, order emails and the Orders tab.
+> - New apps **keep Nevela's existing default roles**. ADMIN and CUSTOMER were Juice Me's choice.
+> - Mail is chosen in the installer: **Resend by default, Brevo as an option**.
+> - The theme is **neutral with one default brand**, built so more themes can be added. Juice Me's orange is not the default.
+> - New in the plan:
+>   - installer tiers: **web, mobile, or both**;
+>   - **one layout generated once and shared by the dashboard and the phone app**, modelled on Juice Me's Home, Orders, Catalogue and More.
+> - The Android notification icon is now generated in the template's push step.
+
 The goal is for `nevela new` (or `nevela mobile`) to produce all of this already wired. The developer then fills in their resources and branding. They shouldn't have to discover each piece in production, one at a time.
 
 ---
