@@ -1,5 +1,5 @@
 {
-    "template": "0.32.0",
+    "template": "0.35.0",
     "files": {
         ".env.example": "3d7dcb13c3219e3ad0b118314295d639fca4547a",
         ".gitignore": "04e4ad07c6719a1dcf9feb1b64d0bda00ad5ebd7",
@@ -26,6 +26,8 @@
         "app/dashboard/account/sessions/page.tsx": "a137b51b3d4352c358aec649c137908399bb0128",
         "app/dashboard/actions.ts": "9b6d112708e20c7efa0eaeba8fbe5fe668f80a9e",
         "app/dashboard/activity/page.tsx": "618b7157b0d6e1bda3fd981b2f5b3354556ccf7d",
+        "app/dashboard/api/openapi.json/route.ts": "af4330f2b7bead1e4ff9ae83e562b7e6e38aea11",
+        "app/dashboard/api/page.tsx": "3aa8ba27f6c8bf1c65e626ce99eb6c48697ae1bb",
         "app/dashboard/copied-actions.ts": "a3164a6c3e994190696368773a0d90db9c1746c9",
         "app/dashboard/error.tsx": "cae68c1b204c119cb165cdffa1539287c6c4ef35",
         "app/dashboard/import-actions.ts": "9f8bbaa9b9c2f10308b89d7b35c90edaaf61232f",
@@ -76,7 +78,7 @@
         "components/dashboard/bulk-create-grid.tsx": "ee58aebcef0d5675be091996e2a34aa99b85bfd7",
         "components/dashboard/column-menu.tsx": "446492eea497ebedca0f52d54c093e31a9658138",
         "components/dashboard/dashboard-header.tsx": "f18bf833d07f30c3b0cc50d8ff7b407de734fd37",
-        "components/dashboard/dashboard-sidebar.tsx": "fc72149e31d2a60921f41105d515dd11d7878e56",
+        "components/dashboard/dashboard-sidebar.tsx": "74385fa475a342337f583ffa492b69a9ccc2d340",
         "components/dashboard/dropzone.tsx": "ed8650d60e7479bc671a3bc62b638a88b7bc8d2a",
         "components/dashboard/editable.ts": "a6ba7f3ecf4803824129317a907b037da661839a",
         "components/dashboard/export-button.tsx": "be9a4f9d8962e2acee55012e9f7fbb78a0a8c67b",
@@ -185,6 +187,7 @@
         "lib/lines.ts": "67e95fb07c24cc8c2e89fc295f567d5912b0bbd0",
         "lib/notifications.ts": "bab003df5b4572778f69b833d6ecb30186d1c17a",
         "lib/number.ts": "54e2fc510a4d103e8c474f160f0bc7ebb69864f7",
+        "lib/openapi.ts": "5881adc43314f3d67b02392adab1a9e99ececc7e",
         "lib/password-rules.ts": "6cf8a46ca9ace375ab4777477df7fc60d8f312a9",
         "lib/resource/index.ts": "a6338252f39a250552850078183ce0c506c894a1",
         "lib/resource/query.ts": "9ec8d55da4ba7f9eb6280642b63c4df0ef5b772f",
@@ -205,10 +208,11 @@
         "lib/views.ts": "d87ed6beb7949bb99d3e12a4fe037a9927f2653f",
         "lib/when.ts": "569ff65dbe3f5f2d3916fd50a1dd3bce4404cb3a",
         "next.config.ts": "3cba09f17792b58688d7a4be5e12787b852466e3",
-        "package.json": "7d41357f062d2df2fa4df7325b3be15b300be0ca",
+        "package.json": "10d8756c432179c1172e07d23c23d9a9e2c1e8d5",
         "policies/index.ts": "53dce2c4d18dfa9e369b20d01f96d250489ce5a3",
         "postcss.config.mjs": "8f8be689e9af58f80351df6e6b551146822f42a4",
         "proxy.ts": "1a37f23236f5ff5db6db33dd3a96aeea0d37a714",
+        "resources/latest-posts.tsx": "d4e57e73b1ca570c27d4d2ea99be98b9027b0ecd",
         "tsconfig.json": "2f9ebb155c95c6be688f9f5e599b1e1c7de0fb4a"
     },
     "dependencies": {
@@ -249,6 +253,23 @@
             "at": "2026-11-17T22:38:55+00:00",
             "from": "0.31.2",
             "to": "0.32.0"
+        },
+        {
+            "at": "2026-11-22T12:25:02+00:00",
+            "from": "0.32.0",
+            "to": "0.35.0",
+            "updated": [
+                "components/dashboard/dashboard-sidebar.tsx"
+            ],
+            "added": [
+                "app/dashboard/api/openapi.json/route.ts",
+                "app/dashboard/api/page.tsx",
+                "lib/openapi.ts"
+            ],
+            "kept": [
+                "resources/latest-posts.tsx"
+            ],
+            "backup": ".nevela/backups/20261122-122502-0.32.0-to-0.35.0"
         }
     ]
 }
