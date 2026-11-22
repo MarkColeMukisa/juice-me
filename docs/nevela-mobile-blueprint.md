@@ -92,7 +92,7 @@ The order of sections matters, so build it in this order:
 - **List endpoints should carry line items.** We added `protected $with = ['orderItems']` to the `Order` model, because the controller's `index` sits inside a `nevela:generated` block and editing inside it blocks regeneration.
   - Generate this, or support `?include=items` on lists.
 - **Lists can filter on one value per field only.** "Active" needs four statuses, so we make four requests and merge them.
-  - Nevela should accept `filter[status]=pending,accepted,preparing,ready`, meaning *in*.
+  - Nevela should accept `filter[status]=pending,accepted,preparing,ready`, meaning *in*. This is planned together with the filter operators in nevela#140.
 - Chip counts come from `/_stats?field=status` values, not from the loaded page.
 - The menu is fetched once (`perPage=100`) and kept in a module cache, so cards can show drink pictures without a request per order.
 
@@ -222,7 +222,8 @@ Sign-in is kept in localStorage on the web (`lib/storage.ts`). The API's default
 | Customer web | Sevalla static site | free |
 
 **Traps:**
-- **Never cache routes** (`INGOT_LARAVEL_OPTIMIZE=false`, no `route:cache`). Nevela 0.33 registers the `nevela-auth` rate limiter and the `nevela.throttle` alias only when routes aren't cached, so a route cache makes sign-in return 500. **Fix this in Nevela**: register them regardless.
+- **Route cache on Nevela 0.33.0:** `nevela-auth` and `nevela.throttle` were registered only when routes weren't cached, so a route cache made sign-in return 500. Juice Me runs with `INGOT_LARAVEL_OPTIMIZE=false` and no `route:cache` for that reason. **Fixed in Nevela 0.33.1**, which registers both whether or not routes are cached. After upgrading, routes can be cached again.
+- Running the scheduler without cron (`schedule:work` beside the web server) is documented in Nevela 0.33.1, in `guides/container-hosts`.
 - **SQLite under parallel requests** answered `database is locked`. The app's home makes many requests at once, and the rate limiter's cache does a read-then-write. Ship these defaults for SQLite in `config/database.php`:
 
   ```php
@@ -312,7 +313,7 @@ This should be in the docs, and ideally in a `nevela handover` checklist:
 - [ ] Push: table, endpoints, `Push::send`, app registration, sign-out cleanup, tap-to-open, Android channel, Firebase and FCM checklist
 - [ ] `expo-updates` with channels, and an `update:preview` script
 - [ ] A web export that survives static hosting (no `node_modules` folder in `dist`), plus a Sevalla static site recipe
-- [ ] SQLite with WAL, busy_timeout and IMMEDIATE transactions; no route cache needed; scheduler inside the web process
+- [ ] SQLite with WAL, busy_timeout and IMMEDIATE transactions; scheduler inside the web process (route cache fixed in 0.33.1)
 - [ ] A warning when `NEVELA_WEB_URL` is localhost in production; restart the dashboard after the proxy secret changes
 - [ ] Flat light and true-black theme tokens with contrast-checked brand pairs; bordered fields; pill buttons; flat tab bar
 - [ ] The sign-in and sign-up design above, in every state
